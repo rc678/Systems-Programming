@@ -66,7 +66,7 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	*/
 	for(currIndex = 0; currIndex < strLen; currIndex++)
 	{
-	/*	if(string[currIndex] == '\')
+		/*if(string[currIndex] == '\n')
 		
 			checkEscape(ts, currIndex, strLen);
 		}*/
@@ -150,7 +150,7 @@ void checkEscape(char* string, int currIndex, int strLen)
 	case 'r':
 	case 'f':
 	case 'a':
-	case '\':
+	case '\n':
 	case '"':
 	default:
 		printf("not an escape character\n");
