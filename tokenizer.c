@@ -13,6 +13,7 @@
 struct TokenizerT_ {
 	char* token;
 	struct TokenizerT_* nextToken;
+	int viewed;
 };
 
 typedef struct TokenizerT_ TokenizerT;
@@ -40,7 +41,6 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	TokenizerT* head;
 	TokenizerT* end;
 	TokenizerT* temp;
-	TokenizerT* p;
 	int currIndex, j;
 	int strLen, sepLen;
 	char* token;
@@ -61,6 +61,9 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	strcpy(string, ts);
 	strcpy(sep, separators);
 
+	/*1st for loop traverses through the given string character by character. 
+	* 2nd for loop checks to see if the character is a separator character. 
+	*/
 	for(currIndex = 0; currIndex < strLen; currIndex++)
 	{
 		for(j = 0; j < sepLen; j++)
@@ -72,56 +75,57 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 			}	
 		}/*end of inner for */
 
-		/* if the current character is not a separator and it is the start of a new token*/
-		if((isNewToken == 1) && (isDelim == 0))
-		{
-			startIndex = currIndex;
-			isNewToken = 0;
-			continue;
-		}
+	/* if the current character is not a separator and it is the start of a new token*/
+	if((isNewToken == 1) && (isDelim == 0))
+	{
+		startIndex = currIndex;
+		isNewToken = 0;
+		continue;
+	}
 	
-		/*finds the index of the last character of the new token*/
-		if((isDelim == 1) && (isNewToken == 0))
+	/*finds the index of the last character of the new token*/
+	if(((isDelim == 1) && (isNewToken == 0)) ||(((isDelim == 0) && (isNewToken == 0) && (currIndex==strLen-1))))
+	{
+		if(currIndex==strLen-1)
 		{
+			endIndex = currIndex;
+		}else{
 			endIndex = currIndex - 1;
-			isNewToken = 1;
-			isDelim = 0;
-			token = substring(string, startIndex, endIndex);
-		/*	printf("token is %s\n", token);*/
-			if(isHead == 1)
-			{
-				isHead = 0;
-				head = (TokenizerT*)malloc(sizeof(TokenizerT));
-				head->token = token;
-				head->nextToken = NULL;
-				temp = head; 
-				end = head;
-			}else{
-				temp = (TokenizerT*) malloc(sizeof(TokenizerT));
-				temp->token = token;
-				temp->nextToken = NULL;
-				end->nextToken = temp;
-				end = end->nextToken;
-			}
-		}	
-	
-		/* if you have multiple separators in the beginning of the string*/
-		if(((isDelim == 1) && (isNewToken == 1)) || ((isDelim == 0) && (isNewToken == 0)))
-		{
-			isDelim = 0;
-			
 		}
+		isNewToken = 1;
+		isDelim = 0;
+		token = substring(string, startIndex, endIndex);
+	/*	printf("token is %s\n", token);*/
+		if(isHead == 1)
+		{
+			isHead = 0;
+			head = (TokenizerT*)malloc(sizeof(TokenizerT));
+			head->token = token;
+			head->nextToken = NULL;
+			head->viewed = 0;
+			temp = head; 
+			end = head;
+		}else{
+			temp = (TokenizerT*) malloc(sizeof(TokenizerT));
+			temp->token = token;
+			temp->nextToken = NULL;
+			temp->viewed = 0; 
+			end->nextToken = temp;
+			end = end->nextToken;
+		}
+	}
+	
+	/* if you have multiple separators in the beginning of the string*/
+	if(((isDelim == 1) && (isNewToken == 1)) || ((isDelim == 0) && (isNewToken == 0)))
+	{
+		isDelim = 0;
+			
+	}
 	
 	}/*end of outer for*/
 		
-/*	print(head);*/ 
+	print(head); 
   	
-	p = head;
-	while(p != NULL)
-	{
-		printf("%s\n", p->token);
-		p = p->nextToken;
-	}
 	return head;
 }
 
@@ -144,7 +148,10 @@ char* substring(char* string, int start, int end)
 	/*printf("str is %s\n", str);
 	printf(" start is %d end is %d size is %d\n ", start, end, size);*/
 
-	curr = 0;	
+	curr = 0;
+	/*for loop goes to the start index of the new token in the given string and copies the characters
+	* into a new array until the end index in the input string. These characters are a token.  
+	*/
 	for(i = start; i <= end; i++)
 	{
 		result[curr] = str[i];
