@@ -21,6 +21,7 @@ typedef struct TokenizerT_ TokenizerT;
 /* function prototypes of the functions I declared.*/
 char* substring(char*, int, int); 
 void print(TokenizerT*);  
+void checkEscape(char*, int, int);
 
 /*
  * TKCreate creates a new TokenizerT object for a given set of separator
@@ -52,19 +53,23 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	int isNewToken = 1;
 	int startIndex = 0;
 	int endIndex = 0; 
-	int isDelim = 0; 
-	int isHead = 1;
+	int isDelim = 0;
+	int isEscape = 0;  
 	head = NULL;
 	end = NULL;
 
 	strcpy(string, ts);
 	strcpy(sep, separators);
-
+	
 	/*1st for loop traverses through the given string character by character. 
 	* 2nd for loop checks to see if the character is a separator character. 
 	*/
 	for(currIndex = 0; currIndex < strLen; currIndex++)
 	{
+	/*	if(string[currIndex] == '\')
+		
+			checkEscape(ts, currIndex, strLen);
+		}*/
 		for(j = 0; j < sepLen; j++)
 		{
 		
@@ -97,9 +102,8 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 		isDelim = 0;
 		token = substring(string, startIndex, endIndex);
 	/*	printf("token is %s\n", token);*/
-		if(isHead == 1)
+		if(head == NULL)
 		{
-			isHead = 0;
 			head = (TokenizerT*)malloc(sizeof(TokenizerT));
 			head->token = token;
 			head->nextToken = NULL;
@@ -129,6 +133,31 @@ TokenizerT *TKCreate(char *separators, char *ts) {
   	
 	return head;
 }
+
+void checkEscape(char* string, int currIndex, int strLen)
+{
+	char str[strLen];
+	char letter;
+	strcpy(str, string);
+	letter = str[currIndex+1];
+
+	switch(letter)
+	{
+	case 'n':
+	case 't':
+	case 'v':
+	case 'b':
+	case 'r':
+	case 'f':
+	case 'a':
+	case '\':
+	case '"':
+	default:
+		printf("not an escape character\n");
+
+	}/*end of switch*/
+	
+}/*end of checkEscape method*/
 
 /*
 * Takes in the input string, index of the 1st character of the token in the input string, and 
@@ -230,8 +259,8 @@ int main(int argc, char **argv) {
 
 	TKCreate(sep, string);
 	
-	/*printf("str is %d\n", strLen);
-	printf("sep is %d\n", sepLen);*/
+	printf("str is %s\n", string);
+/*	printf("sep is %d\n", sepLen);*/
 	
 
   return 0;
