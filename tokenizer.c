@@ -22,7 +22,6 @@ typedef struct TokenizerT_ TokenizerT;
 char* substring(char*, int, int); 
 void print(TokenizerT*);  
 
-
 /*
  * TKCreate creates a new TokenizerT object for a given set of separator
  * characters (given as a string) and a token stream (given as a string).
@@ -68,10 +67,12 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	{
 		for(j = 0; j < sepLen; j++)
 		{
-			if(string[currIndex] == sep[j])
+		
+			printf("sep is %c\n", sep[j]);	
+			if(string[currIndex] == sep[j])/*checks to see if current char is a separator*/
 			{
 				isDelim = 1;
-				break;		
+				break;
 			}	
 		}/*end of inner for */
 
@@ -86,7 +87,7 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	/*finds the index of the last character of the new token*/
 	if(((isDelim == 1) && (isNewToken == 0)) ||(((isDelim == 0) && (isNewToken == 0) && (currIndex==strLen-1))))
 	{
-		if(currIndex==strLen-1)
+		if((currIndex==strLen-1) && (isDelim == 0))
 		{
 			endIndex = currIndex;
 		}else{
@@ -235,3 +236,4 @@ int main(int argc, char **argv) {
 
   return 0;
 }
+
