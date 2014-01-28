@@ -54,7 +54,6 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	int startIndex = 0;
 	int endIndex = 0; 
 	int isDelim = 0;
-	int isEscape = 0;  
 	head = NULL;
 	end = NULL;
 
@@ -66,14 +65,15 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	*/
 	for(currIndex = 0; currIndex < strLen; currIndex++)
 	{
-		/*if(string[currIndex] == '\n')
+		if(string[currIndex] == '\n')
+		{
 		
 			checkEscape(ts, currIndex, strLen);
-		}*/
+		}
 		for(j = 0; j < sepLen; j++)
 		{
 		
-			printf("sep is %c\n", sep[j]);	
+		/*	printf("sep is %c\n", sep[j]);	*/
 			if(string[currIndex] == sep[j])/*checks to see if current char is a separator*/
 			{
 				isDelim = 1;
@@ -139,19 +139,19 @@ void checkEscape(char* string, int currIndex, int strLen)
 	char str[strLen];
 	char letter;
 	strcpy(str, string);
-	letter = str[currIndex+1];
+	letter = str[currIndex];
 
 	switch(letter)
 	{
-	case 'n':
-	case 't':
-	case 'v':
-	case 'b':
-	case 'r':
-	case 'f':
-	case 'a':
 	case '\n':
-	case '"':
+	case '\t':
+	case '\v':
+	case '\b':
+	case '\r':
+	case '\f':
+	case '\a':
+	case '\\':
+	case '\"':
 	default:
 		printf("not an escape character\n");
 
@@ -253,10 +253,14 @@ int main(int argc, char **argv) {
 	int sepLen = strlen(argv[1]);
 	char string[strLen];
 	char sep[sepLen]; 
-
+	int i;
 	strcpy(string, argv[2]);
 	strcpy(sep, argv[1]);
-
+	
+	for(i = 0; i < strLen; i++)
+	{
+		printf("checking index of escape: %c index is %d\n", string[i], i);
+	}
 	TKCreate(sep, string);
 	
 	printf("str is %s\n", string);
