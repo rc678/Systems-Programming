@@ -219,6 +219,15 @@ void print(TokenizerT* head)
  */
 
 void TKDestroy(TokenizerT *tk) {
+	
+	 TokenizerT* curr;
+
+        while(tk != NULL){
+        	curr = tk;
+        	tk = tk->nextToken;
+        	free(curr);
+        }
+    
 }
 
 /*
