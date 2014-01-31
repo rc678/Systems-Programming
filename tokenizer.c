@@ -21,7 +21,7 @@ typedef struct TokenizerT_ TokenizerT;
 /* function prototypes of the functions I declared.*/
 char* substring(char*, int, int); 
 void print(TokenizerT*);  
-void checkEscape(char*, int, int);
+char* checkEscape(char*, int, int);
 
 /*
  * TKCreate creates a new TokenizerT object for a given set of separator
@@ -65,11 +65,6 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	*/
 	for(currIndex = 0; currIndex < strLen; currIndex++)
 	{
-		if(string[currIndex] == '\n')
-		{
-		
-			checkEscape(ts, currIndex, strLen);
-		}
 		for(j = 0; j < sepLen; j++)
 		{
 		
@@ -134,32 +129,59 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	return head;
 }
 
-void checkEscape(char* string, int currIndex, int strLen)
+char* checkEscape(char* string, int currIndex, int strLen)
 {
 	char str[strLen];
 	char letter;
+	char* res;
+	char* hex;  
+	int i;
+	char copy[7]; 
+	char result[strLen + 4]; 
 	strcpy(str, string);
-	letter = str[currIndex];
+	letter = str[currIndex+1];
 
 	switch(letter)
 	{
-	case '\n':
-	case '\t':
-	case '\v':
-	case '\b':
-	case '\r':
-	case '\f':
-	case '\a':
+	case 'n':
+		hex = "[0x0a]";
+		strcpy(copy, hex);
+		break; 
+	case 't':
+		break;
+	case 'v':
+		break;
+	case 'b':
+		break;
+	case 'r':
+		break;
+	case 'f':
+		break;
+	case 'a':
+		break;
 	case '\\':
-	case '\"':
-	default:
-		printf("not an escape character\n");
-
+		break;
+	case '"':
+		break;
 	}/*end of switch*/
+
+	for(i=0; i < strLen + 4; i++)
+	{
+		if(i = currIndex)
+		{
+			
+		}
+		
+		result[i] = str[i];	
+	}
+	
+	return 0; 
 	
 }/*end of checkEscape method*/
 
+	
 /*
+
 * Takes in the input string, index of the 1st character of the token in the input string, and 
 * index of the last character of the token in the input string. Uses these variables to dynamically allocate 
 * the token string. The function returns a pointer to the dynamically allocated string. 
@@ -219,15 +241,6 @@ void print(TokenizerT* head)
  */
 
 void TKDestroy(TokenizerT *tk) {
-	
-	 TokenizerT* curr;
-
-        while(tk != NULL){
-        	curr = tk;
-        	tk = tk->nextToken;
-        	free(curr);
-        }
-    
 }
 
 /*
@@ -266,13 +279,20 @@ int main(int argc, char **argv) {
 	strcpy(string, argv[2]);
 	strcpy(sep, argv[1]);
 	
-	for(i = 0; i < strLen; i++)
+	for(i=0; i < strLen; i++)
 	{
-		printf("checking index of escape: %c index is %d\n", string[i], i);
+		if(string[i] == '\\')
+		{
+			checkEscape(string, i, strLen);
+			/*check if escape character. 
+			* if escape character, replace with hex
+			 return new string*/
+		}
+		
 	}
 	TKCreate(sep, string);
 	
-	printf("str is %s\n", string);
+/*	printf("str is %s\n", string);*/
 /*	printf("sep is %d\n", sepLen);*/
 	
 
