@@ -192,13 +192,14 @@ char* checkEscape(char* string, int currIndex, int strLen)
 		resultIndex++; 
 	}
 	
-	for(i = 0; i < strlen(result); i++)
+/*	for(i = 0; i < strlen(result); i++)
 	{
 		printf("char at %d is %c\n", i, result[i]);	
-	}
-	size = strLen + 4;
+	}*/
+	size = strLen + 5;
 	res = malloc(size);
 	strcpy(res, result);
+	/*printf("res is %s\n", res);*/
 	return res; 
 	
 }/*end of checkEscape method*/
