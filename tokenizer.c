@@ -63,6 +63,10 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	/*1st for loop traverses through the given string character by character. 
 	* 2nd for loop checks to see if the character is a separator character. 
 	*/
+	for(j = 0; j < strLen; j++)
+	{
+		printf("string is %c\n", string[j]);
+	}
 	for(currIndex = 0; currIndex < strLen; currIndex++)
 	{
 		for(j = 0; j < sepLen; j++)
@@ -150,20 +154,36 @@ char* checkEscape(char* string, int currIndex, int strLen)
 		strcpy(copy, hex);
 		break; 
 	case 't':
+		hex = "[0x09]";
+		strcpy(copy, hex);
 		break;
 	case 'v':
+		hex = "[0x0b]";
+		strcoy(copy, hex);
 		break;
 	case 'b':
+		hex = "[0x08]";
+		strcpy(copy, hex);
 		break;
 	case 'r':
+		hex = "[0x0d]";
+		strcpy(copy, hex);
 		break;
 	case 'f':
+		hex = "[0x0c]";
+		strcpy(copy, hex);
 		break;
 	case 'a':
+		hex = "[0x07]";
+		strcpy(copy, hex);
 		break;
 	case '\\':
+		hex = "[0x5x]";
+		strcpy(copy, hex);
 		break;
 	case '"':
+		hex = "[0x22]";
+		strcpy(copy, hex);
 		break;
 	}/*end of switch*/
 
@@ -191,7 +211,7 @@ char* checkEscape(char* string, int currIndex, int strLen)
 		result[resultIndex] = str[i];
 		resultIndex++; 
 	}
-	
+	result[strLen+4] = '\0'; 	
 /*	for(i = 0; i < strlen(result); i++)
 	{
 		printf("char at %d is %c\n", i, result[i]);	
@@ -199,7 +219,7 @@ char* checkEscape(char* string, int currIndex, int strLen)
 	size = strLen + 5;
 	res = malloc(size);
 	strcpy(res, result);
-	/*printf("res is %s\n", res);*/
+/*	printf("res is %s\n", res);*/
 	return res; 
 	
 }/*end of checkEscape method*/
@@ -326,7 +346,13 @@ int main(int argc, char **argv) {
 	}
 
 	finalSize = strlen(finalString);
-	char result[finalSize];		
+	char result[finalSize];
+	strcpy(result, finalString);
+	for(i = 0; i < finalSize; i++)
+	{
+		printf("in main %c\n",result[i]);
+	}
+	
 	TKCreate(sep, result);
 	
 /*	printf("str is %s\n", string);*/
