@@ -1,11 +1,11 @@
 Inputs:
 1.) "" "hello\nworld"
 2.) "" "hello\tworld"
-3.) "" "hello\vworl\bd"
+3.) "" "hello\vworl\bd" (doesn't work)
 4.) "" "hello world"
 5.) "  " "hello  world"
-6.) "\n" "hello\nworld"
-7.) "\?" "hello\?world\?"
+6.) "\n" "hello\nworld" (doesn't work)
+7.) "\?" "hello\?world\?" (doesn't work which is weired b/c this worked before i started the separator characters)
 8.) " " "stringtest"
 
 Expected Outputs:
