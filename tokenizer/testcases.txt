@@ -2,8 +2,21 @@ Inputs:
 1.) "" "hello\nworld"
 2.) "" "hello\tworld"
 3.) "" "hello\vworl\bd"
+4.) "" "hello world"
+5.) "  " "hello  world"
+6.) "\n" "hello\nworld"
+7.) "\?" "hello\?world\?"
+8.) " " "stringtest"
 
 Expected Outputs:
 1.) hello[0x0a]world
 2.) hello[0x09]world
 3.) hello[0x0b]worl[0x08]d
+4.) hello world
+5.) hello
+    world
+6.) hello
+    world
+7.) hello
+    world
+8.) stringtest
