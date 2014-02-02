@@ -65,7 +65,7 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	*/
 	for(j = 0; j < strLen; j++)
 	{
-		printf("string is %c\n", string[j]);
+		printf("STRING IN CREATE TOKEN %c\n", string[j]);
 	}
 	for(currIndex = 0; currIndex < strLen; currIndex++)
 	{
@@ -147,6 +147,10 @@ char* checkEscape(char* string, int currIndex, int strLen)
 	letter = str[currIndex+1];
 
 	printf("CURR INDEX IS %d\n", currIndex);
+/*	for(i = 0; i < strLen; i++)
+	{
+		printf("string in checkEscape is %c\n", str[i]);
+	}*/	
 	switch(letter)
 	{
 	case 'n':
@@ -159,7 +163,7 @@ char* checkEscape(char* string, int currIndex, int strLen)
 		break;
 	case 'v':
 		hex = "[0x0b]";
-		strcoy(copy, hex);
+		strcpy(copy, hex);
 		break;
 	case 'b':
 		hex = "[0x08]";
@@ -212,10 +216,10 @@ char* checkEscape(char* string, int currIndex, int strLen)
 		resultIndex++; 
 	}
 	result[strLen+4] = '\0'; 	
-/*	for(i = 0; i < strlen(result); i++)
+	for(i = 0; i < strlen(result); i++)
 	{
-		printf("char at %d is %c\n", i, result[i]);	
-	}*/
+		printf("char at %d is %c in checkSpace\n", i, result[i]);	
+	}
 	size = strLen + 5;
 	res = malloc(size);
 	strcpy(res, result);
@@ -234,7 +238,7 @@ char* checkEscape(char* string, int currIndex, int strLen)
 char* substring(char* string, int start, int end)
 {
 	int strLen = strlen(string);
-	int size = (end - start) + 2;
+	int size = (end - start) + 1;
 	char result[size];
 	int i, curr;
 	char str[strLen];
@@ -249,15 +253,19 @@ char* substring(char* string, int start, int end)
 	/*for loop goes to the start index of the new token in the given string and copies the characters
 	* into a new array until the end index in the input string. These characters are a token.  
 	*/
-	for(i = start; i <= end; i++)
+	for(i = start; i <= end+1; i++)
 	{
 		result[curr] = str[i];
 		curr++; 
 	}/*end of for*/
 	curr++; 
-	result[curr] = '\0';	
+	result[curr] = '\0';
 	strcpy(res, result);
-	/*printf("res is %s\n", res);*/
+	for(i=0; i < strlen(result); i++)
+	{
+		printf("chars in result array in substring are %c\n", result[i]);
+	}
+	printf("substring is %s\n", res);
 	return res; 	
 	
 }/*end of method*/
@@ -330,30 +338,41 @@ int main(int argc, char **argv) {
 	char string[strLen];
 	char sep[sepLen]; 
 	int i;
+	int isEscapeChar = 0; 
 	int finalSize; 
 	char* finalString; 
 	strcpy(string, argv[2]);
 	strcpy(sep, argv[1]);
-	
+
+/*	for(i = 0; i < strLen; i++)
+	{
+		printf("input string is %c\n", string[i]);
+	}*/	
 	for(i=0; i < strLen; i++)
 	{
-		if(string[i] == '\\')
+		if(string[i] == '\\' && isEscapeChar == 0)
 		{
 			printf("escape char\n");
+			isEscapeChar = 1; 
 			finalString = checkEscape(string, i, strLen);
+			continue; 
 		}
-		
+		if(string[i] == '\\' && isEscapeChar == 1)
+		{
+			finalString = checkEscape(finalString, i, strLen);
+		}
 	}
 
 	finalSize = strlen(finalString);
 	char result[finalSize];
 	strcpy(result, finalString);
-	for(i = 0; i < finalSize; i++)
-	{
-		printf("in main %c\n",result[i]);
-	}
 	
-	TKCreate(sep, result);
+	if(isEscapeChar == 1)
+	{
+		TKCreate(sep, result);
+	}else{
+		TKCreate(sep, string);
+	}
 	
 /*	printf("str is %s\n", string);*/
 /*	printf("sep is %d\n", sepLen);*/
