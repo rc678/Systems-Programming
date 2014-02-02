@@ -1,0 +1,9 @@
+Inputs:
+1.) "" "hello\nworld"
+2.) "" "hello\tworld"
+3.) "" "hello\vworl\bd"
+
+Expected Outputs:
+1.) hello[0x0a]world
+2.) hello[0x09]world
+3.) hello[0x0b]worl[0x08]d
