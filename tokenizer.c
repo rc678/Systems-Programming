@@ -135,12 +135,14 @@ char* checkEscape(char* string, int currIndex, int strLen)
 	char letter;
 	char* res;
 	char* hex;  
-	int i;
+	int i, size; 
 	char copy[7]; 
-	char result[strLen + 4]; 
+	char result[strLen + 5]; 
+	int j, resultIndex;  
 	strcpy(str, string);
 	letter = str[currIndex+1];
 
+	printf("CURR INDEX IS %d\n", currIndex);
 	switch(letter)
 	{
 	case 'n':
@@ -165,17 +167,39 @@ char* checkEscape(char* string, int currIndex, int strLen)
 		break;
 	}/*end of switch*/
 
-	for(i=0; i < strLen + 4; i++)
+	/*for(i=0; i < 6; i++)
 	{
-		if(i = currIndex)
+		printf("copy is %c\n", copy[i]);
+	}*/
+
+	resultIndex = 0;
+	for(i=0; i < strLen; i++)
+	{
+		if(i == currIndex)
 		{
-			
+			printf("ESCAPE CHAR INDEX is %d\n", i);
+			for(j=0; j < 6; j++)
+			{
+				result[resultIndex] = copy[j];
+			/*	printf("result at i+j is %c\n", result[i+j]); 	*/
+				resultIndex++;
+			}
+			i = i + 1;
+			continue;		
 		}
-		
-		result[i] = str[i];	
+
+		result[resultIndex] = str[i];
+		resultIndex++; 
 	}
 	
-	return 0; 
+	for(i = 0; i < strlen(result); i++)
+	{
+		printf("char at %d is %c\n", i, result[i]);	
+	}
+	size = strLen + 4;
+	res = malloc(size);
+	strcpy(res, result);
+	return res; 
 	
 }/*end of checkEscape method*/
 
@@ -241,7 +265,16 @@ void print(TokenizerT* head)
  */
 
 void TKDestroy(TokenizerT *tk) {
-}
+	
+	 TokenizerT* curr;
+
+        while(tk != NULL){
+        	curr = tk;
+        	tk = tk->nextToken;
+        	free(curr);
+        }
+    
+}/*end of TKDestory method*/
 
 /*
  * TKGetNextToken returns the next token from the token stream as a
@@ -276,6 +309,8 @@ int main(int argc, char **argv) {
 	char string[strLen];
 	char sep[sepLen]; 
 	int i;
+	int finalSize; 
+	char* finalString; 
 	strcpy(string, argv[2]);
 	strcpy(sep, argv[1]);
 	
@@ -283,14 +318,15 @@ int main(int argc, char **argv) {
 	{
 		if(string[i] == '\\')
 		{
-			checkEscape(string, i, strLen);
-			/*check if escape character. 
-			* if escape character, replace with hex
-			 return new string*/
+			printf("escape char\n");
+			finalString = checkEscape(string, i, strLen);
 		}
 		
 	}
-	TKCreate(sep, string);
+
+	finalSize = strlen(finalString);
+	char result[finalSize];		
+	TKCreate(sep, result);
 	
 /*	printf("str is %s\n", string);*/
 /*	printf("sep is %d\n", sepLen);*/
