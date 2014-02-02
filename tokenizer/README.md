@@ -1,4 +1,4 @@
 Systems-Programming
 ===================
 
-Project 1 for Systems Programming. Collaboratin with David Rubin. 
+Project 1 for Systems Programming. Collaboration with David Rubin. 
