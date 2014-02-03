@@ -1,25 +1,43 @@
 Inputs:
 1.) "" "hello\nworld"
 2.) "" "hello\tworld"
-3.) "" "hello\vworl\bd" (doesn't work)
-4.) "" "hello world"
-5.) "  " "hello  world"
-6.) "\n" "hello\nworld"
-7.) "\?" "hello\?world\?" (doesn't work) 
-8.) " " "stringtest"
-9.) "12" "hello12world12"
+3.) "" "hello\\world" (doesn't work)
+4.) "" "hello\vworl\bd" (doesn't work)
+5.) "" "hello world"
+6.) "  " "hello  world"
+7.) "\n" "hello\nworld"
+8.) "\?" "hello\?world\?"
+9.) " " "stringtest"
+10.) "12" "hello12world21"
+11.) "l" "hello wor/ld" (doesn't work)
+12.) "\w" "hello worl\d" (doesn't work)
+13.) "\\\\" "hello\\world"
+14.) "\\\\" "this\\\tthat"
+15.) " ." "hello world.
 
 Expected Outputs:
 1.) hello[0x0a]world
 2.) hello[0x09]world
-3.) hello[0x0b]worl[0x08]d
-4.) hello world
-5.) hello
-    world
+3.) hello[0x5c]world
+4.) hello[0x0b]worl[0x08]d
+5.) hello world
 6.) hello
     world
 7.) hello
     world
-8.) stringtest
-9.) hello
+8.) hello
+    world
+9.) stringtest
+10.) hello
+    world
+11.) he
+    o wor
+    d
+12.) hello
+    orld
+13.) hello
+    world
+14.) this
+    [0x09]that
+15.) hello
     world
