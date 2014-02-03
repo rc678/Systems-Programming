@@ -21,8 +21,8 @@ typedef struct TokenizerT_ TokenizerT;
 /* function prototypes of the functions I declared.*/
 char* substring(char*, int, int); 
 void print(TokenizerT*);  
-char* checkEscape(char*, int, int);
-
+char* checkEscape(char*, int, int, char*, int);
+int checkSep(char*, int); 
 /*
  * TKCreate creates a new TokenizerT object for a given set of separator
  * characters (given as a string) and a token stream (given as a string).
@@ -133,7 +133,7 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	return head;
 }
 
-char* checkEscape(char* string, int currIndex, int strLen)
+char* checkEscape(char* string, int currIndex, int strLen, char* sep, int sepLen)
 {
 	char str[strLen];
 	char letter;
@@ -142,7 +142,8 @@ char* checkEscape(char* string, int currIndex, int strLen)
 	int i, size; 
 	char copy[7]; 
 	char result[strLen + 5]; 
-	int j, resultIndex;  
+	int j, resultIndex; 
+	int isSep = 0; 
 	strcpy(str, string);
 	letter = str[currIndex+1];
 
@@ -154,6 +155,11 @@ char* checkEscape(char* string, int currIndex, int strLen)
 	switch(letter)
 	{
 		case 'n':
+			isSep = checkSep(sep, sepLen);  
+			if(isSep == 1)
+			{
+				return string; 
+			}
 			hex = "[0x0a]";
 			strcpy(copy, hex);
 			break; 
@@ -230,6 +236,41 @@ char* checkEscape(char* string, int currIndex, int strLen)
 
 }/*end of checkEscape method*/
 
+int checkSep(char* sep, int sepLen)
+{
+	int i;
+	char seps[sepLen];
+	strcpy(seps, sep);
+
+	for(i=0; i < sepLen; i++)
+	{
+		if(sep[i] == '\\')
+		{
+			switch(sep[i+1])
+			{
+				case 'n':
+					return 1;
+				case 't':
+					return 1; 
+				case 'v':
+					return 1;
+				case 'b':
+					return 1; 
+				case 'r':
+					return 1;
+				case 'f':
+					return 1; 
+				case 'a':
+					return 1;
+				case '\\':
+					return 1;
+				case '"':
+					return 1; 
+			}
+		}
+	}	
+	return 0; 
+}
 
 /*
 
@@ -321,20 +362,7 @@ void TKDestroy(TokenizerT *tk) {
 
 char *TKGetNextToken(TokenizerT *tk) {
 
-	TokenizerT *temp = tk; 
-    
-        if (temp == NULL)
-                return 0;
-    
-        while (temp->viewed == 1){ 
-                temp = temp->nextToken;
-        }   
-    
-        if (temp == NULL)
-                return 0;
-
-        temp->viewed = 1;
-        return temp->token;
+	return NULL;
 }
 
 
@@ -355,18 +383,9 @@ int main(int argc, char **argv) {
 	int i;
 	int finalSize; 
 	char* finalString;
-	char* token;
-	int escapePresent = 0;
-	TokenizerT *tokenizer;
+	int escapePresent = 0; 
 	strcpy(string, argv[2]);
 	strcpy(sep, argv[1]);
-
-	 if(argc < 3){
-                printf("Error: Too few arguments");
-        }
-        if(argc > 3){
-                printf("Error: Too many arguments");
-        }
 
 	/*	for(i = 0; i < strLen; i++)
 		{
@@ -377,7 +396,7 @@ int main(int argc, char **argv) {
 		if(string[i] == '\\')
 		{
 			printf("escape char\n");
-			finalString = checkEscape(string, i, strLen);
+			finalString = checkEscape(string, i, strLen, sep, sepLen);
 			escapePresent = 1; 
 		}
 	}
@@ -387,18 +406,11 @@ int main(int argc, char **argv) {
 		finalSize = strlen(finalString);
 		char result[finalSize];
 		strcpy(result, finalString);
-		tokenizer = TKCreate(sep, result);
+		TKCreate(sep, result);
 	}else{
 		printf("in here\n");
-		tokenizer = TKCreate(sep, string);
+		TKCreate(sep, string);
 	}
-	
-/*	while (*token != 0){
-                token = TKGetNextToken(tokenizer);
-                printf("%s\n", token);
-        }
-*/
-        TKDestroy(tokenizer);
 
 	/*	printf("str is %s\n", string);*/
 	/*	printf("sep is %d\n", sepLen);*/
