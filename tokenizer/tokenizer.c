@@ -321,7 +321,20 @@ void TKDestroy(TokenizerT *tk) {
 
 char *TKGetNextToken(TokenizerT *tk) {
 
-	return NULL;
+	TokenizerT *temp = tk; 
+    
+        if (temp == NULL)
+                return 0;
+    
+        while (temp->viewed == 1){ 
+                temp = temp->nextToken;
+        }   
+    
+        if (temp == NULL)
+                return 0;
+
+        temp->viewed = 1;
+        return temp->token;
 }
 
 
@@ -342,9 +355,18 @@ int main(int argc, char **argv) {
 	int i;
 	int finalSize; 
 	char* finalString;
-	int escapePresent = 0; 
+	char* token;
+	int escapePresent = 0;
+	TokenizerT *tokenizer;
 	strcpy(string, argv[2]);
 	strcpy(sep, argv[1]);
+
+	 if(argc < 3){
+                printf("Error: Too few arguments");
+        }
+        if(argc > 3){
+                printf("Error: Too many arguments");
+        }
 
 	/*	for(i = 0; i < strLen; i++)
 		{
@@ -365,11 +387,18 @@ int main(int argc, char **argv) {
 		finalSize = strlen(finalString);
 		char result[finalSize];
 		strcpy(result, finalString);
-		TKCreate(sep, result);
+		tokenizer = TKCreate(sep, result);
 	}else{
 		printf("in here\n");
-		TKCreate(sep, string);
+		tokenizer = TKCreate(sep, string);
 	}
+	
+/*	while (*token != 0){
+                token = TKGetNextToken(tokenizer);
+                printf("%s\n", token);
+        }
+*/
+        TKDestroy(tokenizer);
 
 	/*	printf("str is %s\n", string);*/
 	/*	printf("sep is %d\n", sepLen);*/
