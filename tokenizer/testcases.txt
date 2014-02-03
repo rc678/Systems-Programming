@@ -4,9 +4,10 @@ Inputs:
 3.) "" "hello\vworl\bd" (doesn't work)
 4.) "" "hello world"
 5.) "  " "hello  world"
-6.) "\n" "hello\nworld" (doesn't work)
-7.) "\?" "hello\?world\?" (doesn't work which is weired b/c this worked before i started the separator characters)
+6.) "\n" "hello\nworld"
+7.) "\?" "hello\?world\?" (doesn't work) 
 8.) " " "stringtest"
+9.) "12" "hello12world12"
 
 Expected Outputs:
 1.) hello[0x0a]world
@@ -20,3 +21,5 @@ Expected Outputs:
 7.) hello
     world
 8.) stringtest
+9.) hello
+    world
