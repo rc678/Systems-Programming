@@ -9,8 +9,8 @@ Inputs:
 8.) "\?" "hello\?world\?"
 9.) " " "stringtest"
 10.) "12" "hello12world21"
-11.) "l" "hello wor/ld" (doesn't work)
-12.) "\w" "hello worl\d" (doesn't work)
+11.) "l" "hello wor\ld" (doesn't work)
+12.) "\w" "hello worl\d"
 13.) "\\\\" "hello\\world"
 14.) "\\\\" "this\\\tthat"
 15.) " ." "hello world.
