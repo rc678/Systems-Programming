@@ -1,23 +1,22 @@
 Inputs:
-1.) "" "hello\nworld"
-2.) "" "hello\tworld"
+1.) " " "stringtest"
+2.) "" "hello\nworld"
 3.) "" "hello\\world" (doesn't work)
-4.) "" "hello\vworl\bd" (doesn't work)
+4.) "" "hello\vworl\bd"
 5.) "" "hello world"
-6.) "  " "hello  world"
-7.) "\n" "hello\nworld"
-8.) "\?" "hello\?world\?"
-9.) " " "stringtest"
-10.) "12" "hello12world21"
-11.) "l" "hello wor\ld" (doesn't work)
-12.) "\w" "hello worl\d"
-13.) "\\\\" "hello\\world"
-14.) "\\\\" "this\\\tthat"
-15.) " ." "hello world.
+6.) " " "hello world"
+7.) "\t" "hello\tworld"
+8.) "\?" "hello\?world?"
+9.) "12" "hello12world21"
+10.) "o" "hello wor\ld"
+11.) "\w" "hello worl\d"
+12.) "\\\\" "hello\\world"
+13.) "\\\\" "this\\\tthat"
+14.) " ." "hello world.'
 
 Expected Outputs:
-1.) hello[0x0a]world
-2.) hello[0x09]world
+1.) stringtest
+2.) hello[0x0a]world
 3.) hello[0x5c]world
 4.) hello[0x0b]worl[0x08]d
 5.) hello world
@@ -27,17 +26,41 @@ Expected Outputs:
     world
 8.) hello
     world
-9.) stringtest
-10.) hello
+9.) hello
     world
-11.) he
-    o wor
-    d
+10.) hell
+      w
+     rld
+11.) hello
+     orld
 12.) hello
-    orld
-13.) hello
+     world
+13.) this
+     [0x09]that
+14.) hello
+     world
+     
+Actual Outputs:
+1.) stringtest
+2.) hello[0x0a]world
+3.) helloworld
+4.) hello\vworl[0x08]d
+5.) hello world
+6.) hello
     world
-14.) this
-    [0x09]that
-15.) hello
+7.) hello
     world
+8.) hello
+    world
+9.) hello
+    world
+10.) hell
+      w
+     rld
+11.) hello
+     orld
+12.) helloworld
+13.) this?
+     tthat
+14.) hello
+     world
