@@ -1,14 +1,14 @@
 /*
- * tokenizer.c
- */
+ *  * tokenizer.c
+ *   */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 
 /*
- * Tokenizer type.  You need to fill in the type as part of your implementation.
- */
+ *  * Tokenizer type.  You need to fill in the type as part of your implementation.
+ *   */
 
 struct TokenizerT_ {
 	char* token;
@@ -24,18 +24,18 @@ void print(TokenizerT*);
 char* checkEscape(char*, int, int, char*, int);
 int checkSep(char*, int); 
 /*
- * TKCreate creates a new TokenizerT object for a given set of separator
- * characters (given as a string) and a token stream (given as a string).
- * 
- * TKCreate should copy the two arguments so that it is not dependent on
- * them staying immutable after returning.  (In the future, this may change
- * to increase efficiency.)
- *
- * If the function succeeds, it returns a non-NULL TokenizerT.
- * Else it returns NULL.
- *
- * You need to fill in this function as part of your implementation.
- */
+ *  * TKCreate creates a new TokenizerT object for a given set of separator
+ *   * characters (given as a string) and a token stream (given as a string).
+ *    * 
+ *     * TKCreate should copy the two arguments so that it is not dependent on
+ *      * them staying immutable after returning.  (In the future, this may change
+ *       * to increase efficiency.)
+ *        *
+ *         * If the function succeeds, it returns a non-NULL TokenizerT.
+ *          * Else it returns NULL.
+ *           *
+ *            * You need to fill in this function as part of your implementation.
+ *             */
 
 TokenizerT *TKCreate(char *separators, char *ts) {
 	TokenizerT* head;
@@ -61,8 +61,8 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	strcpy(sep, separators);
 
 	/*1st for loop traverses through the given string character by character. 
-	 * 2nd for loop checks to see if the character is a separator character. 
-	 */
+	 * 	 * 2nd for loop checks to see if the character is a separator character. 
+	 * 	 	 */
 	for(j = 0; j < strLen; j++)
 	{
 		printf("STRING IN CREATE TOKEN %c\n", string[j]);
@@ -129,13 +129,13 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	}/*end of outer for*/
 	if(startIndex == endIndex)
 	{
-		
-				head = (TokenizerT*)malloc(sizeof(TokenizerT));
-				head->token = ts;
-				head->nextToken = NULL;
-				head->viewed = 0;
-				temp = head; 
-				end = head;		
+
+		head = (TokenizerT*)malloc(sizeof(TokenizerT));
+		head->token = ts;
+		head->nextToken = NULL;
+		head->viewed = 0;
+		temp = head; 
+		end = head;		
 	}
 	print(head); 
 
@@ -143,131 +143,131 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 }
 
 /*CheckEscape accepts a character string, the index at which a backslash occurs, a string of separator
-characters, and the lengths of the two strings. It then checks if the backlash is part of an escape character
-or if it is simply a single backslash.
-
-In the first case, it returns a string of proper length that has the hex form of the escape character in
-question instead of the escape character itself. In the latter case, it returns a string of proper length
-in which the backslash is removed.
-*/
+ * characters, and the lengths of the two strings. It then checks if the backlash is part of an escape character
+ * or if it is simply a single backslash.
+ *
+ * In the first case, it returns a string of proper length that has the hex form of the escape character in
+ * question instead of the escape character itself. In the latter case, it returns a string of proper length
+ * in which the backslash is removed.
+ * */
 char* checkEscape(char* string, int currIndex, int strLen, char* sep, int sepLen)
 {
 	char str[strLen];
-        char letter;
-        char* res;
-        char* hex;
-        int i, size;
-        char copy[7];
-        char result[strLen + 5];
-        char removeBackslash[strLen];
-        int j, resultIndex;
-        int isSep = 0;
-        strcpy(str, string);
-        letter = str[currIndex+1];
+	char letter;
+	char* res;
+	char* hex;
+	int i, size;
+	char copy[7];
+	char result[strLen + 5];
+	char removeBackslash[strLen];
+	int j, resultIndex;
+	int isSep = 0;
+	strcpy(str, string);
+	letter = str[currIndex+1];
 
 	printf("CURR INDEX IS %d\n", currIndex);
 	/*	for(i = 0; i < strLen; i++)
-		{
-		printf("string in checkEscape is %c\n", str[i]);
-		}*/	
+	 *			{
+	 *					printf("string in checkEscape is %c\n", str[i]);
+	 *							}*/	
 	switch(letter)
-        {
-	        case 'n':
-	                isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x0a]";
-	                strcpy(copy, hex);
-	                break;
-	        case 't':
-	                isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x09]";
-	                strcpy(copy, hex);
-	                break;
-	        case 'v':
-	                isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x0b]";
-	                strcpy(copy, hex);
-	                break;
-	        case 'b':
-	                isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x08]";
-	                strcpy(copy, hex);
-	                break;
-	        case 'r':
-	                isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x0d]";
-	                strcpy(copy, hex);
-	                break;
-	        case 'f':
-	                isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x0c]";
-	                strcpy(copy, hex);
-	                break;
-	        case 'a':
+	{
+		case 'n':
 			isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x07]";
-	                strcpy(copy, hex);
-	                break;
-	        case '\\':
-	                isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x5c]";
-	                strcpy(copy, hex);
-	                break;
-	        case '"':
-	                isSep = checkSep(sep, sepLen);
-	                if (isSep == 1){
-	                        return string;
-	                }
-	                hex = "[0x22]";
-	                strcpy(copy, hex);
-	                break;
-	        default:
-	                resultIndex = 0;
-	                for (i = 0; i < strLen; i++)
-	                {
-	                        if (i == currIndex){
-	                                continue;
-	                        }
-	
-	                        removeBackslash[resultIndex] = str[i];
-	                        resultIndex++;
-	                }
-	                removeBackslash[strLen-1] = '\0';
-	                size = strLen;
-	                res = malloc(size);
-	                strcpy(res, removeBackslash);
-	                return res;
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x0a]";
+			strcpy(copy, hex);
+			break;
+		case 't':
+			isSep = checkSep(sep, sepLen);
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x09]";
+			strcpy(copy, hex);
+			break;
+		case 'v':
+			isSep = checkSep(sep, sepLen);
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x0b]";
+			strcpy(copy, hex);
+			break;
+		case 'b':
+			isSep = checkSep(sep, sepLen);
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x08]";
+			strcpy(copy, hex);
+			break;
+		case 'r':
+			isSep = checkSep(sep, sepLen);
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x0d]";
+			strcpy(copy, hex);
+			break;
+		case 'f':
+			isSep = checkSep(sep, sepLen);
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x0c]";
+			strcpy(copy, hex);
+			break;
+		case 'a':
+			isSep = checkSep(sep, sepLen);
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x07]";
+			strcpy(copy, hex);
+			break;
+		case '\\':
+			isSep = checkSep(sep, sepLen);
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x5c]";
+			strcpy(copy, hex);
+			break;
+		case '"':
+			isSep = checkSep(sep, sepLen);
+			if (isSep == 1){
+				return string;
+			}
+			hex = "[0x22]";
+			strcpy(copy, hex);
+			break;
+		default:
+			resultIndex = 0;
+			for (i = 0; i < strLen; i++)
+			{
+				if (i == currIndex){
+					continue;
+				}
+
+				removeBackslash[resultIndex] = str[i];
+				resultIndex++;
+			}
+			removeBackslash[strLen-1] = '\0';
+			size = strLen;
+			res = malloc(size);
+			strcpy(res, removeBackslash);
+			return res;
 	}/*end of switch*/
 
 
 
 	/*for(i=0; i < 6; i++)
-	  {
-	  printf("copy is %c\n", copy[i]);
-	  }*/
+	 * 	  {
+	 * 	  	  printf("copy is %c\n", copy[i]);
+	 * 	  	  	  }*/
 
 	resultIndex = 0;
 	for(i=0; i < strLen; i++)
@@ -302,7 +302,7 @@ char* checkEscape(char* string, int currIndex, int strLen, char* sep, int sepLen
 }/*end of checkEscape method*/
 
 /*If the argument contains a '\' character, checkSep checks if this is a backslash character or
- * part of an escape character*/
+ *  * part of an escape character*/
 int checkSep(char* sep, int sepLen)
 {
 	int i;
@@ -340,11 +340,11 @@ int checkSep(char* sep, int sepLen)
 }
 
 /*
-
- * Takes in the input string, index of the 1st character of the token in the input string, and 
- * index of the last character of the token in the input string. Uses these variables to dynamically allocate 
- * the token string. The function returns a pointer to the dynamically allocated string. 
- */
+ *
+ *  * Takes in the input string, index of the 1st character of the token in the input string, and 
+ *   * index of the last character of the token in the input string. Uses these variables to dynamically allocate 
+ *    * the token string. The function returns a pointer to the dynamically allocated string. 
+ *     */
 char* substring(char* string, int start, int end)
 {
 	int strLen = strlen(string);
@@ -357,12 +357,12 @@ char* substring(char* string, int start, int end)
 	strcpy(str, string);
 
 	/*printf("str is %s\n", str);
-	  printf(" start is %d end is %d size is %d\n ", start, end, size);*/
+	 * 	  printf(" start is %d end is %d size is %d\n ", start, end, size);*/
 
 	curr = 0;
 	/*for loop goes to the start index of the new token in the given string and copies the characters
-	 * into a new array until the end index in the input string. These characters are a token.  
-	 */
+	 * 	 * into a new array until the end index in the input string. These characters are a token.  
+	 * 	 	 */
 	for(i = start; i <= end+1; i++)
 	{
 		result[curr] = str[i];
@@ -381,8 +381,8 @@ char* substring(char* string, int start, int end)
 }/*end of method*/
 
 /*
- * Takes in a reference to the head of the built linked list and prints all the tokens. 
- */
+ *  * Takes in a reference to the head of the built linked list and prints all the tokens. 
+ *   */
 void print(TokenizerT* head)
 {
 	printf("in print\n");
@@ -397,11 +397,11 @@ void print(TokenizerT* head)
 
 
 /*
- * TKDestroy destroys a TokenizerT object.  It should free all dynamically
- * allocated memory that is part of the object being destroyed.
- *
- * You need to fill in this function as part of your implementation.
- */
+ *  * TKDestroy destroys a TokenizerT object.  It should free all dynamically
+ *   * allocated memory that is part of the object being destroyed.
+ *    *
+ *     * You need to fill in this function as part of your implementation.
+ *      */
 
 void TKDestroy(TokenizerT *tk) {
 
@@ -416,104 +416,105 @@ void TKDestroy(TokenizerT *tk) {
 }/*end of TKDestory method*/
 
 /*
- * TKGetNextToken returns the next token from the token stream as a
- * character string.  Space for the returned token should be dynamically
- * allocated.  The caller is responsible for freeing the space once it is
- * no longer needed.
- *
- * If the function succeeds, it returns a C string (delimited by '\0')
- * containing the token.  Else it returns 0.
- *
- * You need to fill in this function as part of your implementation.
- */
+ *  * TKGetNextToken returns the next token from the token stream as a
+ *   * character string.  Space for the returned token should be dynamically
+ *    * allocated.  The caller is responsible for freeing the space once it is
+ *     * no longer needed.
+ *      *
+ *       * If the function succeeds, it returns a C string (delimited by '\0')
+ *        * containing the token.  Else it returns 0.
+ *         *
+ *          * You need to fill in this function as part of your implementation.
+ *           */
 
 char *TKGetNextToken(TokenizerT *tk) {
 
 	TokenizerT *temp = tk;
+	char* res; 
 
-        if (temp == NULL)
-                return 0;
+	if (temp == NULL)
+		return 0;
 
-        while (temp->viewed == 1){
-                temp = temp->nextToken;
-                if (temp == NULL){
-                    return 0;
-                }
-        }
+	if(temp->viewed == 0)
+	{
+		res = temp->token;
+		temp->viewed = 1;
+		return res; 
+	}
 
-        temp->viewed = 1;
-        return temp->token;
+	return 0;
 }
 
 
 /*
- * main will have two string arguments (in argv[1] and argv[2]).
- * The first string contains the separator characters.
- * The second string contains the tokens.
- * Print out the tokens in the second string in left-to-right order.
- * Each token should be printed on a separate line.
- */
+ *  * main will have two string arguments (in argv[1] and argv[2]).
+ *   * The first string contains the separator characters.
+ *    * The second string contains the tokens.
+ *     * Print out the tokens in the second string in left-to-right order.
+ *      * Each token should be printed on a separate line.
+ *       */
 
 int main(int argc, char **argv) {
 
 	if(argc < 3){
-                printf("Error: Too few arguments\n");
-                return 0;
-        }
-        if(argc > 3){
-                printf("Error: Too many arguments\n");
-                return 0;
-        }
+		printf("Error: Too few arguments\n");
+		return 0;
+	}
+	if(argc > 3){
+		printf("Error: Too many arguments\n");
+		return 0;
+	}
 
-        int strLen = strlen(argv[2]);
-        int sepLen = strlen(argv[1]);
-        char string[strLen];
-        char sep[sepLen];
-        int i;
-        int escapePresent = 0;
-        int finalSize;
-        char* finalString;
-        /*char* token;*/
-        TokenizerT *tokenizer;
-        strcpy(string, argv[2]);
-        strcpy(sep, argv[1]);
+	int strLen = strlen(argv[2]);
+	int sepLen = strlen(argv[1]);
+	char string[strLen];
+	char sep[sepLen];
+	int i;
+	int escapePresent = 0;
+	int finalSize;
+	char* finalString;
+	char* token;
+	TokenizerT *tokenizer;
+	strcpy(string, argv[2]);
+	strcpy(sep, argv[1]);
 
-/*      for(i = 0; i < strLen; i++)
- *      {
- *              printf("input string is %c\n", string[i]);
- *      }*/
-        for(i=0; i < strLen; i++)
-        {
-                if(string[i] == '\\')
-                {
-                        printf("escape char\n");
-                        finalString = checkEscape(string, i, strLen, sep, sepLen);
-                        escapePresent = 1;
-                }
-        }
+	/*      for(i = 0; i < strLen; i++)
+	 *       *      {
+	 *        *              printf("input string is %c\n", string[i]);
+	 *         *      }*/
+	for(i=0; i < strLen; i++)
+	{
+		if(string[i] == '\\')
+		{
+			printf("escape char\n");
+			finalString = checkEscape(string, i, strLen, sep, sepLen);
+			escapePresent = 1;
+		}
+	}
 
-        if(escapePresent == 1)
-        {
-                finalSize = strlen(finalString);
-                char result[finalSize];
-                strcpy(result, finalString);
-                tokenizer = TKCreate(sep, result);
-        }else{
-                printf("in here\n");
-                tokenizer = TKCreate(sep, string);
-        }
+	if(escapePresent == 1)
+	{
+		finalSize = strlen(finalString);
+		char result[finalSize];
+		strcpy(result, finalString);
+		tokenizer = TKCreate(sep, result);
+	}else{
+		printf("in here\n");
+		tokenizer = TKCreate(sep, string);
+	}
 
-/*
-        while (*token != 0){
-                token = TKGetNextToken(tokenizer);
-                printf("%s (it's working)\n", token);
-        }
 
-        TKDestroy(tokenizer);
-*/
-/*      printf("str is %s\n", string);*/
-/*      printf("sep is %d\n", sepLen);*/
-	
+	while (tokenizer != NULL){
+		token = TKGetNextToken(tokenizer);
+		printf("%s (it's working)\n", token);
+		tokenizer = tokenizer->nextToken;
+	}
+
+	TKDestroy(tokenizer);
+
+	/*      printf("str is %s\n", string);*/
+	/*      printf("sep is %d\n", sepLen);*/
+
 	return 0;
 }
 
