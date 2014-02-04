@@ -1,7 +1,7 @@
 Inputs:
 1.) " " "stringtest"
 2.) "" "hello\nworld"
-3.) "" "hello\\world" (doesn't work)
+3.) "" "hello\\world" (didn't test)
 4.) "" "hello\vworl\bd" (doesn't work)
 5.) "" "hello world"
 6.) " " "hello world"
@@ -14,11 +14,13 @@ Inputs:
 13.) "\\\\" "this\\\tthat" (doesn't work)
 14.) " ." "hello world.'
 15.) "l" "hello world" (doesn't work)
+16.) "" "hello\\\world" (didnt test)
+17.) "" "hello\world"   (didn't test)
 
 Expected Outputs:
 1.) stringtest
 2.) hello[0x0a]world
-3.) hello[0x5c]world
+3.) helloworld
 4.) hello[0x0b]worl[0x08]d
 5.) hello world
 6.) hello
@@ -43,6 +45,8 @@ Expected Outputs:
 15.) he
      o wor
      d
+16.) hello[0x5c]world
+17.) helloworld
      
 Actual Outputs:
 1.) stringtest
