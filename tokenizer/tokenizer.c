@@ -127,7 +127,16 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 		}
 
 	}/*end of outer for*/
-
+	if(startIndex == endIndex)
+	{
+		
+				head = (TokenizerT*)malloc(sizeof(TokenizerT));
+				head->token = ts;
+				head->nextToken = NULL;
+				head->viewed = 0;
+				temp = head; 
+				end = head;		
+	}
 	print(head); 
 
 	return head;
@@ -507,4 +516,5 @@ int main(int argc, char **argv) {
 	
 	return 0;
 }
+
 
