@@ -75,6 +75,17 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 			/*	printf("sep is %c\n", sep[j]);	*/
 			if(string[currIndex] == sep[j])/*checks to see if current char is a separator*/
 			{
+				if (j>0 && sep[j-1] == '\\' && currIndex>0 && string[currIndex-1] != '\\'){
+                                        continue;
+                                }
+                                if (sep[j] == '\\' && j < sepLen-1){
+                                        if ((sep[j+1] == 'n' || sep[j+1] == 't' || sep[j+1] == 'v' || sep[j+1] == 'b' ||
+                                        sep[j+1] == 'r' || sep[j+1] == 'f' || sep[j+1] == 'a' || sep[j+1] == '\\' || 
+                                        sep[j+1] == '"') && string[currIndex+1] == sep[j+1]){
+                                                j++;
+                                        }
+                                }
+                                
 				isDelim = 1;
 				break;
 			}	
