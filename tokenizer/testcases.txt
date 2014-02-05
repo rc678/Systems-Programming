@@ -14,6 +14,7 @@ Inputs:
 13.) "\\\\" "this\\\\\tthat" (doesn't work)
 14.) " ." "hello world."
 15.) "l" "hello world"
+16.) "\t" "hell\fo wo\trld"
 
 Expected Outputs:
 1.) stringtest
@@ -43,6 +44,8 @@ Expected Outputs:
 15.) he
      o wor
      d
+16.) hell[0x0c]o wo
+     rld
      
 Actual Outputs:
 1.) stringtest
@@ -71,3 +74,6 @@ Actual Outputs:
      world
 15.) he
      o wor
+     d
+16.) hell[0x0c]o wo
+     rld
