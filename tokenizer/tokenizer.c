@@ -261,6 +261,9 @@ char* fixEscape(char* string, int strLen, char* sep, int sepLen, int size)
 
 	for (i=0; i<strLen; i++)
 	{
+		if (str[i] == '\\' && i == 0){
+                        continue;
+                }
 
 		if (str[i] == '\\' && i > 0 && str[i-1] != '\\')
 		{
@@ -569,7 +572,7 @@ int main(int argc, char **argv) {
 	 *   		}*/
 	for(i=0; i < strLen; i++)
 	{
-		if(string[i] == '\\' && i>0 && string[i-1] != '\\')
+		if((string[i] == '\\' && i == 0) || (string[i] == '\\' && i>0 && string[i-1] != '\\'))
 		{
 			printf("escape char\n");
 			/*finalString = checkEscape(string, i, strLen, sep, sepLen);
