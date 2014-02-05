@@ -15,7 +15,8 @@ Inputs:
 14.) " ." "hello world."
 15.) "l" "hello world"
 16.) "\t" "hell\fo wo\trld"
-17.) "\v" "this\b\vhat"
+17.) "\v" "this\b\vhat" (doesn't work)
+18.) "\t" "escape\tcharacter"
 
 Expected Outputs:
 1.) stringtest
@@ -49,6 +50,8 @@ Expected Outputs:
      rld
 17.) this[0x08]
      hat
+18.) escape
+     character
      
 Actual Outputs:
 1.) stringtest
@@ -80,3 +83,7 @@ Actual Outputs:
      d
 16.) hell[0x0c]o wo
      rld
+17.) this[0x08]?
+     hat
+18.) escape
+     character
