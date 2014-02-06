@@ -73,24 +73,17 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	{
 		for(j = 0; j < sepLen; j++)
 		{
-
-			/*	printf("sep is %c\n", sep[j]);	*/
-			if(string[currIndex] == sep[j])/*checks to see if current char is a separator*/
-			{
-				if (j>0 && sep[j-1] == '\\' && currIndex>0 && string[currIndex-1] != '\\'){
+                        if(string[currIndex] == sep[j])/*checks to see if current char is a separator*/
+                        {   
+                                if (j>0 && sep[j-1] == '\\' && currIndex>0 && string[currIndex-1] != '\\' &&  
+                                (sep[j] == 'n' || sep[j] == 't' || sep[j] == 'v' || sep[j] == 'b' ||
+                                sep[j] == 'r' || sep[j] == 'f' || sep[j] == 'a' || sep[j] == '\\' ||  
+                                sep[j] == '"')){
                                         continue;
-                                }
-                                if (sep[j] == '\\' && j < sepLen-1){
-                                        if ((sep[j+1] == 'n' || sep[j+1] == 't' || sep[j+1] == 'v' || sep[j+1] == 'b' ||
-                                        sep[j+1] == 'r' || sep[j+1] == 'f' || sep[j+1] == 'a' || sep[j+1] == '\\' || 
-                                        sep[j+1] == '"') && string[currIndex+1] == sep[j+1]){
-                                                j++;
-                                        }
-                                }
-                                
-				isDelim = 1;
-				break;
-			}
+                                }   
+                                isDelim = 1;
+                                break;
+                        }   
 		}/*end of inner for */
 
 		/* if the current character is not a separator and it is the start of a new token*/
