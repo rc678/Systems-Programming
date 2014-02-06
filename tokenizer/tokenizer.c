@@ -77,9 +77,20 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 			/*	printf("sep is %c\n", sep[j]);	*/
 			if(string[currIndex] == sep[j])/*checks to see if current char is a separator*/
 			{
+				if (j>0 && sep[j-1] == '\\' && currIndex>0 && string[currIndex-1] != '\\'){
+                                        continue;
+                                }
+                                if (sep[j] == '\\' && j < sepLen-1){
+                                        if ((sep[j+1] == 'n' || sep[j+1] == 't' || sep[j+1] == 'v' || sep[j+1] == 'b' ||
+                                        sep[j+1] == 'r' || sep[j+1] == 'f' || sep[j+1] == 'a' || sep[j+1] == '\\' || 
+                                        sep[j+1] == '"') && string[currIndex+1] == sep[j+1]){
+                                                j++;
+                                        }
+                                }
+                                
 				isDelim = 1;
 				break;
-			}	
+			}
 		}/*end of inner for */
 
 		/* if the current character is not a separator and it is the start of a new token*/
@@ -153,6 +164,10 @@ TokenizerT *TKCreate(char *separators, char *ts) {
 	return head;
 }
 
+/*checkEscape accepts a character string, the index at which a backslash occurs, a string of separator
+characters, and the lengths of the two strings.. It determines if there is an escape charcter at this index of the string.
+If so, if this escape character is also a separator, it will return 0. If not, it will return 4. If the character is not
+an escape character at all, it will return -1. These ints represent the change in length of the final output string*/
 int checkEscape(char* string, int currIndex, int strLen, char* sep, int sepLen)
 {
 	char letter;
@@ -233,14 +248,9 @@ int checkEscape(char* string, int currIndex, int strLen, char* sep, int sepLen)
 	}
 }
 
-/*CheckEscape accepts a character string, the index at which a backslash occurs, a string of separator
- *  * characters, and the lengths of the two strings. It then checks if the backlash is part of an escape character
- *   * or if it is simply a single backslash.
- *    *
- *     * In the first case, it returns a string of proper length that has the hex form of the escape character in
- *      * question instead of the escape character itself. In the latter case, it returns a string of proper length
- *       * in which the backslash is removed.
- *        * */
+/*fixEscape accepts a token string, a separator string, the lengths of these two strings, and the size of the final
+output string. It then reads through the input token string and changes all escape characters to their hex form. It also
+eliminates any extra backslashes that are not part of an escape character. It returns the final string as a char pointer*/
 char* fixEscape(char* string, int strLen, char* sep, int sepLen, int size)
 {
 	char str[strLen];
@@ -567,7 +577,7 @@ int main(int argc, char **argv) {
 	 *      	 	 	 *   		}*/
 	for(i=0; i < strLen; i++)
 	{
-		if(string[i] == '\\' && i>0 && string[i-1] != '\\')
+		if((string[i] == '\\' && i == 0) || (string[i] == '\\' && i>0 && string[i-1] != '\\'))
 		{
 			printf("escape char\n");
 			/*finalString = checkEscape(string, i, strLen, sep, sepLen);
