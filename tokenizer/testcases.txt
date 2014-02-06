@@ -7,14 +7,14 @@ Inputs:
 6.) " " "hello world"
 7.) "\t" "hello\tworld"
 8.) "\?" "hello\?world?"
-9.) "12" "hello12world21"
+9.) "12" "hello12worl21d"
 10.) "o" "hello wor\ld"
 11.) "\w" "\hello worl\d"
 12.) "\\\\" "hello\\\\world"
 13.) " ." "hello world."
 14.) "l" "hello world"
 15.) "\t" "hell\fo wo\trld"
-16.) "\v" "this\b\vthat"
+16.) "\b" "this\b\vthat"
 17.) "\t" "escape\tcharacter"
 
 Expected Outputs:
@@ -30,7 +30,8 @@ Expected Outputs:
 8.) hello
     world
 9.) hello
-    world
+    worl
+    d
 10.) hell
       w
      rld
@@ -45,8 +46,8 @@ Expected Outputs:
      d
 15.) hell[0x0c]o wo
      rld
-16.) this[0x08]
-     that
+16.) this
+     [0x0b]that
 17.) escape
      character
      
@@ -63,7 +64,8 @@ Actual Outputs:
 8.) hello
     world
 9.) hello
-    world
+    worl
+    d
 10.) hell
       w
      rld
@@ -78,7 +80,7 @@ Actual Outputs:
      d
 15.) hell[0x0c]o wo
      rld
-16.) this[0x08]
-     that
+16.) this
+     [0x0b]that
 17.) escape
      character
