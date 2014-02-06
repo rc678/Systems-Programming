@@ -15,8 +15,8 @@ Inputs:
 14.) " ." "hello world."
 15.) "l" "hello world"
 16.) "\t" "hell\fo wo\trld"
-17.) "\v" "this\b\vhat" (doesn't work)
-18.) "\t" "escape\tcharacter"
+17.) "\v" "this\b\vhat"
+18.) "\t" "escape\tcharacter" (doesn't work)
 
 Expected Outputs:
 1.) stringtest
