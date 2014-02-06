@@ -9,14 +9,13 @@ Inputs:
 8.) "\?" "hello\?world?"
 9.) "12" "hello12world21"
 10.) "o" "hello wor\ld"
-11.) "\w" "hello worl\d"
+11.) "\w" "\hello worl\d"
 12.) "\\\\" "hello\\\\world"
-13.) "\\\\" "this\\\\\tthat" (doesn't work)
-14.) " ." "hello world."
-15.) "l" "hello world"
-16.) "\t" "hell\fo wo\trld"
-17.) "\v" "this\b\vhat"
-18.) "\t" "escape\tcharacter" (doesn't work)
+13.) " ." "hello world."
+14.) "l" "hello world"
+15.) "\t" "hell\fo wo\trld"
+16.) "\v" "this\b\vthat"
+17.) "\t" "escape\tcharacter"
 
 Expected Outputs:
 1.) stringtest
@@ -39,18 +38,16 @@ Expected Outputs:
      orld
 12.) hello
      world
-13.) this
-     [0x09]that
-14.) hello
+13.) hello
      world
-15.) he
+14.) he
      o wor
      d
-16.) hell[0x0c]o wo
+15.) hell[0x0c]o wo
      rld
-17.) this[0x08]
-     hat
-18.) escape
+16.) this[0x08]
+     that
+17.) escape
      character
      
 Actual Outputs:
@@ -74,16 +71,14 @@ Actual Outputs:
      orld
 12.) hello
      world
-13.) this
-     tthat
-14.) hello
+13.) hello
      world
-15.) he
+14.) he
      o wor
      d
-16.) hell[0x0c]o wo
+15.) hell[0x0c]o wo
      rld
-17.) this[0x08]?
-     hat
-18.) escape
+16.) this[0x08]
+     that
+17.) escape
      character
