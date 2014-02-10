@@ -2,8 +2,8 @@
  * sorted-list.c
  */
 
-#include	<string.h>
-#include	"sorted-list.h"
+#include <string.h>
+#include "sorted-list.h"
 
 int compareInts(void *p1, void *p2)
 {
@@ -31,4 +31,5 @@ int compareStrings(void *p1, void *p2)
 
 int main()
 {
+	return 0; 
 }
