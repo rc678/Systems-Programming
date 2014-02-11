@@ -7,10 +7,22 @@
 #include <stdlib.h>
 
 /*
+ * node type to hold data and next node values
+ */
+
+struct node{
+    void* data;
+    struct node* next;
+};
+typedef struct node* nodePtr;
+
+/*
  * Sorted list type.  You need to fill in the type as part of your implementation.
  */
 struct SortedList
 {
+    node* head;
+    CompareFuncT cf;
 };
 typedef struct SortedList* SortedListPtr;
 
@@ -21,6 +33,7 @@ typedef struct SortedList* SortedListPtr;
  */
 struct SortedListIterator
 {
+    SortedListPtr curr;
 };
 typedef struct SortedListIterator* SortedListIteratorPtr;
 
