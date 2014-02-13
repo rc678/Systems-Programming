@@ -6,36 +6,6 @@
 
 #include <stdlib.h>
 
-/*
- * node type to hold data and next node values
- */
-
-struct node{
-    void* data;
-    struct node* next;
-};
-typedef struct node* nodePtr;
-
-/*
- * Sorted list type.  You need to fill in the type as part of your implementation.
- */
-struct SortedList
-{
-    node* head;
-    CompareFuncT cf;
-};
-typedef struct SortedList* SortedListPtr;
-
-
-/*
- * Iterator type for user to "walk" through the list item by item, from
- * beginning to end.  You need to fill in the type as part of your implementation.
- */
-struct SortedListIterator
-{
-    SortedListPtr curr;
-};
-typedef struct SortedListIterator* SortedListIteratorPtr;
 
 
 /*
@@ -53,6 +23,35 @@ typedef struct SortedListIterator* SortedListIteratorPtr;
  */
 
 typedef int (*CompareFuncT)(void *, void *);
+
+typedef struct node{
+	void* data;
+	int counter;
+	struct node* next;
+}node, *nodePtr;
+
+/*
+ * Sorted list type.  You need to fill in the type as part of your implementation.
+ */
+struct SortedList
+{
+	nodePtr head;
+	CompareFuncT cf;
+};
+typedef struct SortedList* SortedListPtr;
+
+
+/*
+ * Iterator type for user to "walk" through the list item by item, from
+ * beginning to end.  You need to fill in the type as part of your implementation.
+ */
+struct SortedListIterator
+{
+	nodePtr curr;
+};
+typedef struct SortedListIterator* SortedListIteratorPtr;
+
+
 
 
 /*
