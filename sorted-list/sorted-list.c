@@ -47,7 +47,7 @@ int SLInsert(SortedListPtr list, void* newObj)
                         return 0;
                 } else {
                         ptr->next = newNode;
-                        newNode->numPtrs++:
+                        newNode->numPtrs++;
                         return 1;
                 }   
         }   
