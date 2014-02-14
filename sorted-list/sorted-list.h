@@ -26,7 +26,7 @@ typedef int (*CompareFuncT)(void *, void *);
 
 typedef struct node{
 	void* data;
-	int counter;
+	int numPtrs;
 	struct node* next;
 }node, *nodePtr;
 
