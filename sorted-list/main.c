@@ -32,14 +32,14 @@ int compareStrings(void *p1, void *p2)
 
 int main()
 {
-	SortedListPtr list = SLCreate(compareInts);
-	SortedListIteratorPtr it; 
-	
+	printf("in main\n");
+	SortedListPtr list = SLCreate(compareInts);	
+	printf("after list\n");
+
 	int* a = (int*) malloc(sizeof(double));
 	*a = 12;
 	SLInsert(list, (void*)a);
-	
-	it = SLCreateIterator(list);
-	
+
+	printf("after insert\n");
 	return 0;
 }
