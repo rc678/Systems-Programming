@@ -76,6 +76,40 @@ int SLInsert(SortedListPtr list, void* newObj)
 
 int SLRemove(SortedListPtr list, void* newObj)
 {
+	nodePtr prev = NULL;
+	int compare = (*list->cf)(newObj,list->head->data);
+	SortedListIteratorPtr p = SLCreateIterator(list);/*p points to head of list*/
+	void* currObj;
+
+	if(p == NULL)/*list is empty*/	
+	{
+		printf("list is empty\n");
+		return 0;
+	}
+
+	if(compare == 0)/*newObj is equal to head, so removes the head of the list*/
+	{
+		list->head = list->head->next;
+		list->head->numPtrs++;
+		free(p->curr);
+		SLDestroyIterator(p);
+		return 1;
+	}
+
+	prev = p->curr;
+	currObj = p->curr->next->data;
+	while(p->curr != NULL)/*traverses Linked List to find object to delete*/
+	{
+		compare = (*list->cf)(newObj, cuttObj);
+		if(compare == 0){
+			prev->next = curr->next;
+			free(p->curr);
+			SLDestoryIterator(p);
+			return 1;
+		}
+		
+		
+	}
 	return 0;
 }
 
