@@ -6,6 +6,7 @@
 SortedListPtr SLCreate(CompareFuncT cf)
 {
 
+	printf("in create\n");
 	SortedListPtr list; 
 	if(cf != NULL)
 	{
@@ -24,11 +25,13 @@ void SLDestroy(SortedListPtr list)
 
 int SLInsert(SortedListPtr list, void* newObj)
 {	
+	printf("in sorted list and new object is %d\n", *(int*) newObj);
 	nodePtr newNode = (nodePtr)malloc(sizeof(node));
         newNode->data = newObj;
         nodePtr ptr = list->head;
         int compareValue = list->cf(newObj, ptr->data);
 
+	printf("yooo\n");
         if (ptr == NULL){
                 list->head = newNode;
                 newNode->numPtrs++;
@@ -92,7 +95,7 @@ int SLRemove(SortedListPtr list, void* newObj)
 		list->head = list->head->next;
 		list->head->numPtrs++;
 		free(p->curr);
-		SLDestroyIterator(p);
+		/*call destory iterator?*/
 		return 1;
 	}
 
@@ -100,11 +103,9 @@ int SLRemove(SortedListPtr list, void* newObj)
 	currObj = p->curr->next->data;
 	while(p->curr != NULL)/*traverses Linked List to find object to delete*/
 	{
-		compare = (*list->cf)(newObj, cuttObj);
+		compare = (*list->cf)(newObj, currObj);
 		if(compare == 0){
-			prev->next = curr->next;
-			free(p->curr);
-			SLDestoryIterator(p);
+			
 			return 1;
 		}
 		
@@ -120,7 +121,7 @@ SortedListIteratorPtr SLCreateIterator(SortedListPtr list)
 	if(list->head != NULL)
 	{
 		itPtr->curr = list->head;
-		list->head->counter++;
+		list->head->numPtrs++;
 		return itPtr; 
 			
 	}		
