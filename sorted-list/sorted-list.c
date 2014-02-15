@@ -26,17 +26,18 @@ void SLDestroy(SortedListPtr list)
 int SLInsert(SortedListPtr list, void* newObj)
 {	
 	printf("in sorted list and new object is %d\n", *(int*) newObj);
-	nodePtr newNode = (nodePtr)malloc(sizeof(node));
+        nodePtr newNode = (nodePtr)malloc(sizeof(node));
         newNode->data = newObj;
         nodePtr ptr = list->head;
-        int compareValue = list->cf(newObj, ptr->data);
+        int compareValue;
 
-	printf("yooo\n");
         if (ptr == NULL){
                 list->head = newNode;
                 newNode->numPtrs++;
                 return 1;
         }   
+
+        compareValue = (*list->cf)(newObj, ptr->data);
 
         if (compareValue > 0){ 
                 newNode->next = ptr;
@@ -60,16 +61,17 @@ int SLInsert(SortedListPtr list, void* newObj)
         while (compareValue <= 0){ 
 
                 ptr = ptr->next;
-                if (compareValue == 0){
+                if (compareValue == 0){ 
+                        printf("duplicate value\n");
                         return 0;
-                }
+                }   
 
                 if (ptr->next == NULL){
                         break;
-                }
+                }   
 
                 compareValue = list->cf(newObj, ptr->next->data);
-        }
+        }   
 
         newNode->next = ptr->next;
         ptr->next = newNode;
