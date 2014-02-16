@@ -77,5 +77,14 @@ int main()
                 ptr = ptr->next;
         }
 
+	SLDestroy(list);
+        free(a);
+        free(b);
+        free(c);
+        free(d);
+        free(e);
+        free(f);
+        free(g);
+        
         return 0;
 }
