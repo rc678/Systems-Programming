@@ -20,7 +20,16 @@ SortedListPtr SLCreate(CompareFuncT cf)
 
 void SLDestroy(SortedListPtr list)
 {
-	
+	nodePtr curr = list->head;
+        nodePtr temp = curr->next;
+        while (temp != NULL){
+                free(curr);
+                curr = temp;
+                temp = curr->next;
+        }   
+
+        free(curr);
+        free(list);	
 }
 
 int SLInsert(SortedListPtr list, void* newObj)
@@ -48,6 +57,7 @@ int SLInsert(SortedListPtr list, void* newObj)
 
         if (ptr->next == NULL){
                 if (compareValue == 0){ 
+                	free(newNode);
                         return 0;
                 } else {
                         ptr->next = newNode;
@@ -61,7 +71,8 @@ int SLInsert(SortedListPtr list, void* newObj)
         while (compareValue <= 0){ 
 
                 ptr = ptr->next;
-                if (compareValue == 0){ 
+                if (compareValue == 0){
+                	free(newNode);
                         printf("duplicate value\n");
                         return 0;
                 }   
