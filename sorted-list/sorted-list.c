@@ -97,10 +97,11 @@ int SLRemove(SortedListPtr list, void* newObj)
 	{
 		return 0;
 	}
-	nodePtr prev = NULL;
-	int compare = (*list->cf)(newObj,list->head->data);
-	SortedListIteratorPtr p = SLCreateIterator(list);/*p points to head of list*/
-	void* compareObj;
+	nodePtr ptr;
+	SortedListIteratorPtr p = SLCreateIterator(list);
+	nodePtr prev = p->curr;
+	void* compareObj = SLNextItem(p); 
+	int compare = (*list->cf)(newObj,compareObj);
 
 	printf("list head numPTrs is %d\n", list->head->numPtrs);
 	if(p == NULL)/*list is empty*/	
@@ -116,7 +117,7 @@ int SLRemove(SortedListPtr list, void* newObj)
 		{
 			printf("deleting the head if it is the only item in the list\n");
 			list->head->numPtrs--;
-			if(list->head->numPtrs == 1){
+			if(list->head->numPtrs == 0){
 				free(p->curr);
 				/*destroy iterator?*/
 			}
@@ -125,7 +126,7 @@ int SLRemove(SortedListPtr list, void* newObj)
 		printf("deleting the head is the list has more than one element\n");
 		list->head->numPtrs--;
 		list->head = list->head->next;
-		if(list->head->numPtrs == 1)
+		if(list->head->numPtrs == 0)
 		{
 			free(p->curr);
 			/*destory iterator?*/
@@ -137,34 +138,37 @@ int SLRemove(SortedListPtr list, void* newObj)
 	{
 		return 0;
 	}
-	prev = p->curr;/*prev is at the head*/
-	compareObj = p->curr->next->data;
+
+	printf("prev in the beginning is %d\n", *(int*)prev->data);
 	while(p->curr != NULL)/*traverses Linked List to find object to delete*/
 	{
 		printf("in loop\n");
-		compare = (*list->cf)(newObj, compareObj);/*compares curr to newObject*/
 		if(compare == 0){
 			printf("deleting node if it is not the head\n");
-			prev->next->numPtrs--;
-			prev->next = p->curr->next;
+			prev->numPtrs--;
+			printf("p data is %d\n", *(int*)p->curr->data);
 			if(p->curr->numPtrs == 0)/*if there are no pointers pointing to the node*/
 			{
 				free(p->curr);
 				return 1;
 			}
-			return 1;/*still 1 even though i didnt free b/c it is "removed" from the list.*/ 
+			return 1;
 			/*destory iterator?*/	
 		}
-		prev = prev->next;
 		compareObj = SLNextItem(p);
+		prev = prev->next;
+		compare = (*list->cf)(newObj,compareObj);
+		printf("compare object is %d\n", *(int*)compareObj);
 		if(compareObj == NULL)/*if not found in the list*/
 		{
 			printf("not in list\n");
 			return 0;
 		}
+		printf("in loop\n");
 		/*do i still have to increment the iterator somehow?*/
 
 	}
+	
 	return 0;
 }
 
