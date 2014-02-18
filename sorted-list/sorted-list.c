@@ -98,13 +98,13 @@ int SLRemove(SortedListPtr list, void* newObj)
 	{
 		return 0;
 	}
-	nodePtr ptr;
+	nodePtr temp;
 	SortedListIteratorPtr p = SLCreateIterator(list);
 	nodePtr prev = p->curr;
 	void* compareObj = SLNextItem(p); 
 	int compare = (*list->cf)(newObj,compareObj);
 
-	printf("list head numPTrs is %d\n", list->head->numPtrs);
+	printf("iterator points to  %d\n", *(int*)p->curr->data);
 	if(p == NULL)/*list is empty*/	
 	{
 		printf("list is empty\n");
@@ -144,22 +144,40 @@ int SLRemove(SortedListPtr list, void* newObj)
 	while(p->curr != NULL)/*traverses Linked List to find object to delete*/
 	{
 		printf("in loop\n");
+		compare = (*list->cf)(newObj, compareObj);
 		if(compare == 0){
 			printf("deleting node if it is not the head\n");
-			prev->numPtrs--;
-			printf("p data is %d\n", *(int*)p->curr->data);
-			if(p->curr->numPtrs == 0)/*if there are no pointers pointing to the node*/
+			if(p->curr->next == NULL)
 			{
-				free(p->curr);
+				printf("LSDKLDSKFSD\n");
+				p->curr->numPtrs--;;
+				printf("BBBBBBBB\n");
+				temp = prev->next;
+				prev->next = NULL;
+				printf("AAAAAAAAAAAAAA\n");
+				if(p->curr->numPtrs == 0)
+				{
+					printf("CCCCCCC\n");
+					free(temp);
+					return 1;
+				} 
+			}
+			prev->next->numPtrs--;
+			temp->next = prev->next;
+			printf("prev data is %d and numPtrs is %d\n", *(int*)prev->data, p->curr->numPtrs);
+			if(prev->numPtrs == 1)/*if there are no pointers pointing to the node*/
+			{
+				printf("LALAALA\n");
+				free(prev);
 				return 1;
 			}
 			return 1;
 			/*destory iterator?*/	
 		}
 		compareObj = SLNextItem(p);
+		printf("compareObj is %d prev is %d and numPtrs on iter is %d\n", *(int*)compareObj, *(int*)prev->data, p->curr->numPtrs);
+		temp = prev;
 		prev = prev->next;
-		compare = (*list->cf)(newObj,compareObj);
-		printf("compare object is %d\n", *(int*)compareObj);
 		if(compareObj == NULL)/*if not found in the list*/
 		{
 			printf("not in list\n");
@@ -199,7 +217,7 @@ void SLDestoryIterator(SortedListIteratorPtr iter)
 
 void* SLNextItem(SortedListIteratorPtr iter)
 {
-		void* nextItem;
+	void* currData; 
 	nodePtr temp;
 
 	if(iter == NULL)
@@ -207,20 +225,24 @@ void* SLNextItem(SortedListIteratorPtr iter)
 		printf("list is empty\n");
 		return NULL;
 	}
-
-
+	iter->curr->numPtrs--;
+	if(iter->curr->numPtrs == 0)
+	{
+		free(iter->curr);
+	}
+	
 	if(iter->curr->next == NULL)/*if you are at the end of the list*/
 	{
-		return NULL;	
+		return iter->curr->data;	
 	}else{/*if there is more than one item in the list*/
-		iter->curr->numPtrs--;
-		temp = iter->curr->next;
-		iter->curr = temp;
-		nextItem = iter->curr->data;
-		iter->curr->numPtrs++;
-		return nextItem;
+		if(iter->curr->numPtrs != 0){/*if the current node is not the one that needs to be removed*/
+			currData = iter->curr->data;
+			iter->curr = iter->curr->next;
+			iter->curr->numPtrs++;
+			return currData;	
+		}
 	}
 
 
-	return nextItem;
+	return NULL;
 }
