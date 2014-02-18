@@ -42,11 +42,17 @@ int SLInsert(SortedListPtr list, void* newObj)
 
         if (ptr == NULL){
                 list->head = newNode;
+                printf("%d\n", newNode->numPtrs);
                 newNode->numPtrs++;
                 return 1;
         }   
 
         compareValue = (*list->cf)(newObj, ptr->data);
+
+        if (compareValue == 0){ 
+                free(newNode);
+                return 0;
+        }    
 
         if (compareValue > 0){ 
                 newNode->next = ptr;
@@ -56,14 +62,9 @@ int SLInsert(SortedListPtr list, void* newObj)
         }    
 
         if (ptr->next == NULL){
-                if (compareValue == 0){ 
-                	free(newNode);
-                        return 0;
-                } else {
-                        ptr->next = newNode;
-                        newNode->numPtrs++;
-                        return 1;
-                }   
+                ptr->next = newNode;
+                newNode->numPtrs++;
+                return 1;
         }   
 
         compareValue = list->cf(newObj, ptr->next->data);
@@ -71,8 +72,8 @@ int SLInsert(SortedListPtr list, void* newObj)
         while (compareValue <= 0){ 
 
                 ptr = ptr->next;
-                if (compareValue == 0){
-                	free(newNode);
+                if (compareValue == 0){ 
+                        free(newNode);
                         printf("duplicate value\n");
                         return 0;
                 }   
