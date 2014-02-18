@@ -33,41 +33,27 @@ int compareStrings(void *p1, void *p2)
 int main()
 {
 	printf("in main\n");
-        SortedListPtr list = SLCreate(compareInts);    
+        SortedListPtr list = SLCreate(compareInts);
         printf("after list\n");
-        int z;  
+        int z, i;
+        int* b;
 
-        int* a = (int*) malloc(sizeof(double));
-        int* b = (int*) malloc(sizeof(double));
-        int* c = (int*) malloc(sizeof(double));
-        int* d = (int*) malloc(sizeof(double));
-        int* e = (int*) malloc(sizeof(double));
-        int* f = (int*) malloc(sizeof(double));
-        int* g = (int*) malloc(sizeof(double));
+        if (argc == 1){
+                return 1;
+        }
 
-        *a = 11; 
+        int* a = (int*) malloc(sizeof(int));
+        *a = atoi(argv[1]);
         z = SLInsert(list, (void*)a);
-        printf("%d\n", z); 
-        *b = 20;
-        z = SLInsert(list, (void*)b);
-        printf("%d\n", z); 
-        *c = 5;
-        z = SLInsert(list, (void*)c);
-        printf("%d\n", z); 
-        *d = -8;
-        z = SLInsert(list, (void*)d);
-        printf("%d\n", z);
-        *e = 9;
-        z = SLInsert(list, (void*)e);
-        printf("%d\n", z);
-        *f = 11;
-        z = SLInsert(list, (void*)f);
-        printf("%d\n", z);
-        *g = 52;
-        z = SLInsert(list, (void*)g);
         printf("%d\n", z);
 
-
+        for (i = 2; i < argc; i++){
+                b = (int*)malloc(sizeof(int));  
+                *b = atoi(argv[i]);
+                z = SLInsert(list, (void*)b);
+                printf("%d\n", z);
+        }
+        
         printf("after insert\n");
 
         nodePtr ptr = list->head;
@@ -77,14 +63,13 @@ int main()
                 ptr = ptr->next;
         }
 
-	SLDestroy(list);
+        SLDestroy(list);
+
         free(a);
-        free(b);
-        free(c);
-        free(d);
-        free(e);
-        free(f);
-        free(g);
-        
-        return 0;
+
+        if (argc > 2){
+                free(b);
+        }
+
+        return 1;
 }
