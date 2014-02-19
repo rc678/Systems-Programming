@@ -149,16 +149,12 @@ int SLRemove(SortedListPtr list, void* newObj)
 			printf("deleting node if it is not the head\n");
 			if(p->curr->next == NULL)
 			{
-				printf("LSDKLDSKFSD\n");
 				p->curr->numPtrs--;;
-				printf("BBBBBBBB\n");
-				temp = prev->next;
-				prev->next = NULL;
-				printf("AAAAAAAAAAAAAA\n");
+				temp->next = NULL;
+				printf("prev is %d\n", *(int*)prev->data);
 				if(p->curr->numPtrs == 0)
 				{
-					printf("CCCCCCC\n");
-					free(temp);
+					free(prev);
 					return 1;
 				} 
 			}
