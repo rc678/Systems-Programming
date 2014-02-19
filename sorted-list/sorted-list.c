@@ -212,7 +212,36 @@ SortedListIteratorPtr SLCreateIterator(SortedListPtr list)
 
 void SLDestoryIterator(SortedListIteratorPtr iter)
 {
+	nodePtr temp1 = iter->curr;
+        nodePtr temp2;
 
+        if (temp1 == NULL){
+                free(iter);
+                return;
+        }   
+
+        temp2 = temp1->next;
+
+        if (temp2 == NULL && temp1,->numPtrs > 1){ 
+                free(iter);
+                return;
+        }    
+
+        while (temp2 != NULL)
+        {   
+                temp1->numPtrs--;
+                if (temp1->numPtrs > 0){ 
+                        free(iter);
+                        return;
+                }   
+                    
+                free(temp1);
+                temp1 = temp2;
+                temp2 = temp1->next;
+        }   
+            
+        free(temp1);
+        free(iter);
 }
 
 void* SLNextItem(SortedListIteratorPtr iter)
