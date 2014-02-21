@@ -29,7 +29,7 @@ Expected Output: SLInsert returns 0
 Actual Output: SLInsert returns 0
 
 6.)
-Removing an existing element from the beginning, middle, or end of the list
+Removing an existing element from the beginning, middle, and end of the list
 Input: list = 12 9 6 0 -4
        SLRemove 12 6 -4
 Expected Output: 9 0 
