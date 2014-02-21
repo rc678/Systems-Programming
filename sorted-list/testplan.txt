@@ -1,3 +1,4 @@
+1.)
 Normal SLInsert for the beginning, middle, and end of list
 (Data is dynammically allocated)
 Insert: 9 12 -4 6 0
