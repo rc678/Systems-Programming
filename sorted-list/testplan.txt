@@ -4,3 +4,45 @@ Insert: 9 12 -4 6 0
 Expected output: 12 9 6 0 -4
 Actual Output: 12 9 6 0 -4
 
+2.)
+Same test with SLInsert but with doubles. Also testing with duplicates.
+Input: 2.33 -1.11 21.884 5 0 -1.11 
+Expected output: 21.884 5 2.33 0 -1.11 
+Actual output: 21.884 5 2.33 0 -1.11 
+
+3.) 
+Same test with SLInsert but with Strings.
+Input: "woof" "ribbit" "meow" "roar" "hiss"
+Expected Output: woof roar ribbit meow hiss
+Actual Output: woof roar ribbit meow hiss
+
+4.) 
+SLInsert on NULL data
+Input: SLInsert(sortedListPtr, NULL)
+Expected Output: SLInsert returns 0
+Actual Output: SLInsert returns 0
+
+5.) SLInsert on a NULL list
+Input: SLInsert(NULL, *void)
+Expected Output: SLInsert returns 0
+Actual Output: SLInsert returns 0
+
+6.)
+Removing an existing element from the beginning, middle, or end of the list
+Input: list = 9 12 -4 6 0
+       SLRemove 9 0 -4
+Expected Output: 12 6 
+Actual Output: 12 6
+
+7.)
+Removing a nonexisting element
+Input: list = 9 12 -4 6 0
+       SLRemove 100
+Expected output: 12 9 6 0 -4
+Actual output: 12 9 6 0 -4
+
+8.)
+
+
+
+
