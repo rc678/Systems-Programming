@@ -26,9 +26,9 @@ typedef int (*CompareFuncT)(void *, void *);
 typedef void (*DestructFuncT)( void * );
 
 typedef struct node{
-	void* data;
-	int numPtrs;
-	int isInList;
+	void* data; /*holds new value*/
+	int numPtrs; /*keeps track of the number of pointers pointing to the node*/
+	int isInList; /*Set to 1 when inserted into sorted list, set to 0 when removed*/
 	struct node* next;
 }node, *nodePtr;
 
@@ -37,9 +37,9 @@ typedef struct node{
  */
 struct SortedList
 {
-	nodePtr head;
-	CompareFuncT cf;
-	DestructFuncT df;
+	nodePtr head; /*points to node with greatest data in list*/
+	CompareFuncT cf; /*comparator function pointer that determines if objects in list are ints, doubles, or strings*/
+	DestructFuncT df; /*destruct funtion pointer that determines whether data was dynamically allocated or not*/
 };
 typedef struct SortedList* SortedListPtr;
 
@@ -50,7 +50,7 @@ typedef struct SortedList* SortedListPtr;
  */
 struct SortedListIterator
 {
-	nodePtr curr;
+	nodePtr curr; /*points to node that gives the iterator's current current position*/
 };
 typedef struct SortedListIterator* SortedListIteratorPtr;
 
