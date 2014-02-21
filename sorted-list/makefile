@@ -1,4 +1,3 @@
-COMPILER = gcc
 all: main
 
 main: main.o sorted-list.o 
