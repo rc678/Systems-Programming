@@ -297,33 +297,36 @@ void SLDestroyIterator(SortedListIteratorPtr iter)
 void* SLNextItem(SortedListIteratorPtr iter)
 {
 	void* currData; 
-	nodePtr temp;
+    
+        /*Simply return if iter is a NULL pointer*/
+        if (iter == NULL){
+                return NULL;
+        }   
 
-	if(iter == NULL)
-	{
-		printf("list is empty\n");
-		return NULL;
-	}
-	
-	iter->curr->numPtrs--;
-	
-	if(iter->curr->numPtrs == 0)
-	{
-		free(iter->curr);
-	}
-	
-	if(iter->curr->next == NULL)/*if you are at the end of the list*/
-	{
-		return iter->curr->data;	
-	}else{/*if there is more than one item in the list*/
-		if(iter->curr->numPtrs != 0){/*if the current node is not the one that needs to be removed*/
-			currData = iter->curr->data;
-			iter->curr = iter->curr->next;
-			iter->curr->numPtrs++;
-			return currData;	
-		}
-	}
+        nodePtr ptr = iter->curr; /*node pointer to current node*/
 
+        /*If the first node pointed to by iterator is NULL, return NULL*/
+        if (ptr == NULL){
+                return NULL;
+        }   
 
-	return NULL;
+        ptr->numPtrs--; /*The iterator will no longer be pointing to this node*/
+
+        /*Iterate through the list until a node that has not ben removed from the sorted list is found*/
+        while(ptr->isInList == 0){ 
+
+                ptr = ptr->next;
+
+                /*If the end of the list is reach without success, return NULL*/
+                if (ptr == NULL){
+                        return NULL;
+                }   
+        }   
+    
+        currData = ptr->data;
+        if (ptr->next != NULL){
+                ptr->next->numPtrs++; /*Now the iterator points to the next item*/
+        }   
+        iter->curr = ptr->next;
+        return currData;
 }
