@@ -29,19 +29,88 @@ Actual Output: SLInsert returns 0
 
 6.)
 Removing an existing element from the beginning, middle, or end of the list
-Input: list = 9 12 -4 6 0
-       SLRemove 9 0 -4
-Expected Output: 12 6 
-Actual Output: 12 6
+Input: list = 12 9 6 0 -4
+       SLRemove 12 6 -4
+Expected Output: 9 0 
+Actual Output: 9 0 
 
 7.)
 Removing a nonexisting element
-Input: list = 9 12 -4 6 0
+Input: list = 12 9 6 0 -4
        SLRemove 100
 Expected output: 12 9 6 0 -4
 Actual output: 12 9 6 0 -4
 
 8.)
+SLNextItem on a NULL iterator
+Input: SLNextItem(NULL)
+Expected Output: NULL
+Actual Output: NULL
+
+9.)
+Iterate on an Empty list
+Input: SLNextItem(iter) when iter->curr == NULL
+Expected Output: NULL
+Actual Output: NULL
+
+10.)
+Call SLNextItem when iterator points to item in list
+Input: list = 12 9 6 0 -4; iterator points to 9,  call SLNextItem
+Expected Output: 9 
+Actual Output: 9 
+
+11.)
+Create multiple iterators and call SLNextItem on both iterchangeably 
+Input: list = 12 9 6 0 -4; both iterators point to 12, call SLNextItem on both
+Expected Output: 12 12
+Actual Output: 12 12
+
+12.)
+Create iterator, remove head of list, create new iterator, call SLNextItem on both
+Input: list = 12 9 6 0 -4; create iter1, remove 12, create iter2, call SLNextItem on both respectively
+Expected Output: 9 9
+Actual Output: 9 9 
+
+13.) 
+Call SLNextItem on a destroyed iterator
+Input: list = 12 9 6 0 -4, create iterator, destroy iterator, call SLNextItem
+Expected Output: NULL
+Actual Output: NULL
+
+14.)
+Remove head item with iterator pointing to it 
+Input: list = 12 9 6 0 -4; iterator on 12, remove 12, call SLNextITem
+Expected Output: 9
+Actual Output: 9
+
+15.)
+Remove end item with iterator pointing to it
+Input: list = 12 9 6 0 -4; iterator points to -4, remove -4, call SLNextItem
+Expected output: NULL
+Actual Output: NULL
+
+
+16.) 
+Remove element with iterator pointing to element before it 
+Input: list = 12 9 6 0 -4; iterator points to 6, remove 0, call SLNextItem twice
+Expected Output: 6 -4
+Actual Output: 6 -4
+
+17.) 
+Add element with iterator pointing to element before it
+Input: list = 12 9 6 0 -4; iterator points to 6, add 2, call SLNextItem 3 times
+Expected Output: 6 2 0
+Actual Output: 6 2 0 
+
+
+
+
+
+
+
+
+
+
 
 
 
