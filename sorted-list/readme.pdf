@@ -10,4 +10,6 @@ The function SLCreateIterator has the worst case and best case running time of b
 
 SLDestroyIterator frees all the nodes that have 0 pointers pointing to it. The best case running time would be big O(1) because in this case, you only free the iterator struct. The worst case running time would be big O(n) because you would have to free every node in the linked list and the iterator. The total memory available would increase because this function frees any malloced memory as long as numPtrs is 0. 
 
-SLNextItem returns a void* to the data that the iterator is currently pointing to and it moves the iterator to the next node. The best case running time is big O(1) because you only move the iterator once or the list is NULL. The worst case running time is O(n) and it occurs when you have to traverse all the inserted items and do not find a node in which isInList is equal to 0. The memory used in this function 
+SLNextItem returns a void* to the data that the iterator is currently pointing to and it moves the iterator to the next node. The best case running time is big O(1) because you only move the iterator once or the list is NULL. The worst case running time is O(n) and it occurs when you have to traverse all the inserted items and do not find a node in which isInList is equal to 0. There is no memory or data stored in the heap because you do not malloc any data. 
+
+The overall running time of our program O(n+n+n) = O(3n) = O(n). This occurs if the user inserts n items, removes n items, and then frees those n items in the list. 
