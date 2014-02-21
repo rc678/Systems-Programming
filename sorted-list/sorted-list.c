@@ -58,6 +58,11 @@ int SLInsert(SortedListPtr list, void* newObj)
         if (newObj == NULL){
         	return 0;
         }
+        /*return 0 if list is NULL*/
+        if(list == NULL)
+        {
+        	return 0;
+        }
 
         nodePtr newNode = (nodePtr)malloc(sizeof(node));
         newNode->data = newObj;
