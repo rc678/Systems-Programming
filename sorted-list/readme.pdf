@@ -6,4 +6,8 @@ This function SLInsert works by checking if the data in the list is higher, lowe
 
 The function SLRemove works by traversing the linked list and comparing the data in each node to the newObj variable. If the data is equal to 0, then you decrement the number of pointers to the node and remove the item from the list. The best case big O running time is O(1) becuase that is when the list is NULL or you remove the head of the linked list. The worst case running time occurs when you traverse the linked list and the item to be removed is not in the liinked list. This results in the running time of big O(n). There is no permanent memory used in this function because no data is malloced, but there is some memory that is freed. As a result, the total memory available increases. 
 
-The function SLCreateIterator
+The function SLCreateIterator has the worst case and best case running time of big O(1) because the function creates and iterator struct and points it to the head of the linked list. The memory used in this function is the size of mallocing one iterator struct. 
+
+SLDestroyIterator frees all the nodes that have 0 pointers pointing to it. The best case running time would be big O(1) because in this case, you only free the iterator struct. The worst case running time would be big O(n) because you would have to free every node in the linked list and the iterator. The total memory available would increase because this function frees any malloced memory as long as numPtrs is 0. 
+
+SLNextItem returns a void* to the data that the iterator is currently pointing to and it moves the iterator to the next node. The best case running time is big O(1) because you only move the iterator once or the list is NULL. The worst case running time is O(n) and it occurs when you have to traverse all the inserted items and do not find a node in which isInList is equal to 0. The memory used in this function 
