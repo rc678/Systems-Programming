@@ -1,23 +1,6 @@
-SLInsert
-1.)
-Input: 20 52 11 11 -8
-Expected Output: 52 20 11 -8
+Normal SLInsert for the beginning, middle, and end of list
+(Data is dynammically allocated)
+Insert: 9 12 -4 6 0
+Expected output: 12 9 6 0 -4
+Actual Output: 12 9 6 0 -4
 
-SLRemove
-List:
-52 20 11 -8
-1.) 
-Input: 20
-Output: 52 20 11 -8
-
-2.)
-Input: 52
-Output: 20 11 -8
-
-3.) 
-Input: -8
-Output: 52 20 11
-
-4.)
-Input: 100
-Output: 52 20 11 -8
