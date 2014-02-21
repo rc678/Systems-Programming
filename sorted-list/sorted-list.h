@@ -23,10 +23,12 @@
  */
 
 typedef int (*CompareFuncT)(void *, void *);
+typedef void (*DestructFuncT)( void * );
 
 typedef struct node{
 	void* data;
 	int numPtrs;
+	int isInList;
 	struct node* next;
 }node, *nodePtr;
 
@@ -37,6 +39,7 @@ struct SortedList
 {
 	nodePtr head;
 	CompareFuncT cf;
+	DestructFuncT df;
 };
 typedef struct SortedList* SortedListPtr;
 
@@ -65,7 +68,7 @@ typedef struct SortedListIterator* SortedListIteratorPtr;
  * You need to fill in this function as part of your implementation.
  */
 
-SortedListPtr SLCreate(CompareFuncT cf);
+SortedListPtr SLCreate(CompareFuncT cf, DestructFuncT df);
 
 /*
  * SLDestroy destroys a list, freeing all dynamically allocated memory.
