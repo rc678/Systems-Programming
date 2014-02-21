@@ -111,7 +111,6 @@ int SLRemove(SortedListPtr list, void* newObj)
 		return 0;
 	}
 
-	printf("here2\n");
 	if(compare == 0)/*newObj is equal to head, so removes the head of the list. Remember to check if the list has only one item*/
 	{
 		if(list->head->next == NULL)/*if there is only one node in the list*/
@@ -120,6 +119,7 @@ int SLRemove(SortedListPtr list, void* newObj)
 			list->head->numPtrs--;
 			if(list->head->numPtrs == 0){
 				free(p->curr);
+				list->head = NULL;
 				/*destroy iterator?*/
 			}
 			return 1;
@@ -140,10 +140,8 @@ int SLRemove(SortedListPtr list, void* newObj)
 		return 0;
 	}
 
-	printf("prev in the beginning is %d\n", *(int*)prev->data);
 	while(p->curr != NULL)/*traverses Linked List to find object to delete*/
 	{
-		printf("in loop\n");
 		compare = (*list->cf)(newObj, compareObj);
 		if(compare == 0){
 			printf("deleting node if it is not the head\n");
@@ -158,7 +156,7 @@ int SLRemove(SortedListPtr list, void* newObj)
 					return 1;
 				} 
 			}
-			prev->next->numPtrs--;
+			prev->numPtrs--;
 			temp->next = prev->next;
 			printf("prev data is %d and numPtrs is %d\n", *(int*)prev->data, p->curr->numPtrs);
 			if(prev->numPtrs == 1)/*if there are no pointers pointing to the node*/
@@ -170,20 +168,21 @@ int SLRemove(SortedListPtr list, void* newObj)
 			return 1;
 			/*destory iterator?*/	
 		}
+		if(prev == NULL && compare != 0)
+		{
+			printf("not found in the list\n");
+			return 0;
+		}
 		compareObj = SLNextItem(p);
 		printf("compareObj is %d prev is %d and numPtrs on iter is %d\n", *(int*)compareObj, *(int*)prev->data, p->curr->numPtrs);
 		temp = prev;
 		prev = prev->next;
 		if(compareObj == NULL)/*if not found in the list*/
 		{
-			printf("not in list\n");
+			printf("list is empty\n");
 			return 0;
 		}
-		printf("in loop\n");
-		/*do i still have to increment the iterator somehow?*/
-
 	}
-	
 	return 0;
 }
 
