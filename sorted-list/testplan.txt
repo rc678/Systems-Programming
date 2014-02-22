@@ -61,7 +61,7 @@ Expected Output: 12
 Actual Output: 12 
 
 11.)
-Create multiple iterators and call SLNextItem on both iterchangeably 
+Create multiple iterators and call SLNextItem on both 
 Input: list = 12 9 6 0 -4; both iterators point to 12, call SLNextItem on both
 Expected Output: 12 12
 Actual Output: 12 12
