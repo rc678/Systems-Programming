@@ -56,7 +56,7 @@ Actual Output: NULL
 
 10.)
 Call SLNextItem when iterator points to item in list
-Input: list = 12 9 6 0 -4; iterator points to 9,  call SLNextItem
+Input: list = 12 9 6 0 -4; iterator points to 12,  call SLNextItem
 Expected Output: 12 
 Actual Output: 12 
 
