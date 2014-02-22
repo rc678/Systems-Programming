@@ -1,3 +1,5 @@
+/*The overall running time of the program is O(n + n + n) = O(3n) = big O(n). This run time occurs when the user inserts n items, removes n items, and frees those n items in the linked list*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "sorted-list.h"
