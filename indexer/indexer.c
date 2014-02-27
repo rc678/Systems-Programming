@@ -3,8 +3,18 @@
 #include <dirent.h>/*functions to go through directories*/
 
 /*Recursively indexes all the files in a directory*/
-int readFiles(char* name)
+int readFiles(char* dir)
 {
+	DIR* directory = opendir(dir);
+	struct dirent* file; 
+
+	while((file = readdir(directory)) != NULL)
+	{
+		printf("%s\n", file->d_name);
+	}
+
+	return 0;
+	
 	
 }
 
@@ -19,5 +29,6 @@ int main(int argc, char** argv)
 	}
 
 	char* dir = argv[2];
-	readFiles(dir);	
+	readFiles(dir);
+		
 }
