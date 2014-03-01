@@ -7,11 +7,18 @@
 #include <string.h>
 #include "uthash.h"
 
+/*Goes through files and parses the strings*/
+void stringParser(const char* directoryName, char* fileName)
+{
+
+}
+
 /*returns a 1 if the file is a directory*/ 
 int validFile(const char* parent, char* name)
 {
 	struct stat statbuf; 
 	char* path = malloc(strlen(name) + strlen(parent) + 2);
+//	printf("parent is %s name is %s\n", parent, name);
 	sprintf(path, "%s%s", parent, name);
 	stat(path, &statbuf);
 	return S_ISDIR(statbuf.st_mode); 
@@ -19,24 +26,34 @@ int validFile(const char* parent, char* name)
 /*Recursively indexes all the files in a directory. Returns 1 if successful in indexing and 0 if not.*/
 int readFiles(char* dir)
 {
-	DIR* directory = opendir(dir);
+	DIR* directory;
 	struct dirent* file; 
 	struct stat statbuf;
 	char* name; 
 	stat(dir, &statbuf);
+	FILE* currFile; 
 
 	/*if user enter the name of a directory or file that does not exist*/
 	if(stat(dir, &statbuf) == -1)
 	{
-		printf("dir is NULL\n");
+		printf("dir is %s\n", dir);
 		return 0;
 	}
 
+	//printf("DIR IS %s\n", dir);
 	if(S_ISREG(statbuf.st_mode))
 	{
-		printf("Indexing 1 file\n");
-		/*WRITE CODE TO INDEX FILE HERE*/
-	}else{
+	//	printf("in here and file name is %s\n", dir);
+		currFile = fopen(dir, "r");
+		if(currFile != NULL)
+		{
+			//printf("FILE OPENED PROPERLY\n");
+			/*FILE IS NOW OPEN. WRITE CODE TO INDEX FILE HERE*/
+		}
+	}
+
+	 if(S_ISDIR(statbuf.st_mode)){
+		directory = opendir(dir);
 
 		while((file = readdir(directory)) != NULL)
 		{
@@ -46,13 +63,10 @@ int readFiles(char* dir)
 				continue; 
 			}
 			printf("%s\n", file->d_name);
-			if(validFile(dir, name) == 1)
-			{
-				char* nextFile = malloc(strlen(dir) + strlen(name) + 2);
-				sprintf(nextFile, "%s%s", dir, name);
+				char* nextFile = malloc(strlen(dir) + strlen(name) + 1);
+				sprintf(nextFile, "%s/%s", dir, name);
 				readFiles(nextFile);
 				free(nextFile);				
-			}
 
 		}
 	}
