@@ -6,19 +6,14 @@
 #include <unistd.h>
 #include <string.h>
 #include "uthash.h"
-
-/*Goes through files and parses the strings*/
-void stringParser(const char* directoryName, char* fileName)
-{
-
-}
+#include "tokenizer.c"
 
 /*returns a 1 if the file is a directory*/ 
 int validFile(const char* parent, char* name)
 {
 	struct stat statbuf; 
 	char* path = malloc(strlen(name) + strlen(parent) + 2);
-//	printf("parent is %s name is %s\n", parent, name);
+	//	printf("parent is %s name is %s\n", parent, name);
 	sprintf(path, "%s%s", parent, name);
 	stat(path, &statbuf);
 	return S_ISDIR(statbuf.st_mode); 
@@ -43,16 +38,19 @@ int readFiles(char* dir)
 	//printf("DIR IS %s\n", dir);
 	if(S_ISREG(statbuf.st_mode))
 	{
-	//	printf("in here and file name is %s\n", dir);
+		//	printf("in here and file name is %s\n", dir);
 		currFile = fopen(dir, "r");
 		if(currFile != NULL)
 		{
 			//printf("FILE OPENED PROPERLY\n");
 			/*FILE IS NOW OPEN. WRITE CODE TO INDEX FILE HERE*/
+			split(currFile);
+			
 		}
+		return 0;
 	}
 
-	 if(S_ISDIR(statbuf.st_mode)){
+	if(S_ISDIR(statbuf.st_mode)){
 		directory = opendir(dir);
 
 		while((file = readdir(directory)) != NULL)
@@ -63,10 +61,10 @@ int readFiles(char* dir)
 				continue; 
 			}
 			printf("%s\n", file->d_name);
-				char* nextFile = malloc(strlen(dir) + strlen(name) + 1);
-				sprintf(nextFile, "%s/%s", dir, name);
-				readFiles(nextFile);
-				free(nextFile);				
+			char* nextFile = malloc(strlen(dir) + strlen(name) + 1);
+			sprintf(nextFile, "%s/%s", dir, name);
+			readFiles(nextFile);
+			free(nextFile);				
 
 		}
 	}
