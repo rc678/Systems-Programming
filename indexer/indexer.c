@@ -47,7 +47,7 @@ int readFiles(char* dir)
 		
 		/*printf("FILE OPENED PROPERLY\n");*/
 		/*FILE IS NOW OPEN. WRITE CODE TO INDEX FILE HERE*/
-		split(currFile);
+		split(currFile, dir);
 	}
 
 	if(S_ISDIR(statbuf.st_mode)){
