@@ -1,0 +1,120 @@
+1.) Input is not in a directory
+Input: ./indexer "output.txt" "input.txt"
+
+Output:
+<list> blue
+input.txt 1
+</list>
+
+</list> is
+input.txt 1
+</list>
+
+<list> sky
+input.txt 1
+</list>
+
+<list> the
+input.txt 1
+</list>
+
+2.) Input file does not exist
+Input: ./indexer "output.txt" "lala.txt"
+
+Output: NULL
+
+3.) Input file has repeating words
+Input: ./indexer "output.txt" "input2.txt"
+ 
+Output:
+<list> blue
+input2.txt 2
+</list>
+
+<list> is
+input2.txt 2
+</list>
+
+<list> sky
+input2.txt 1
+</list>
+
+<list> the
+input2.txt 1
+</list>
+
+4.) Input file is a directory with multiple text files
+Input: ./indexer "output.txt" "tests"
+<list> a
+input3.txt 1 
+</list>
+
+<list> bear33
+input3.txt 1 input4.txt
+</list>
+
+<list> blue
+input3.txt 3 input4.txt 2
+</list>
+
+5.) Input directory has multiple directories with files in each directory. Two words are the same except one has numbers. 
+Input: ./indexer "output.txt" "tests2"
+<list> blue
+InputAAAA.txt 1
+</list>
+
+<list> cookie
+InputAA.txt 1 
+</list>
+
+<list> green
+InputA.txt 1 InputAAAA.txt 1
+</list>
+
+<list> is
+InputAA.txt 1
+</list>
+
+<list> monster
+InputAA.txt 1
+</list>
+
+<list> orange
+InputA.txt 2 InputAAA.txt 1
+</list>
+
+<list> red11
+InputAA.txt
+</list>
+
+<list>red
+InputA.txt 2 InputAAA.txt 2
+</list>
+
+6.) Input text document has escape characters
+Input ./indexer "output.txt" "escape.txt"
+Output: 
+<list> hello
+escape.txt 1
+</list>
+
+<list> world
+escape.txt 1
+</list>
+
+7.) Input directory does not exist
+Input ./indexer "output.txt" "lala"
+
+Output: NULL (directory does not exist)
+
+8.) Writing to a file that already exists
+Input: ./indexer "output.txt" "input.txt"
+Output: Press 1 to overwrite file or 2 to make a new file. 
+
+9.) Number of arguements is greater than 3
+Input: ./indexer "output.txt" "input.txt" "input.txt"
+Output: Need 3 arguements
+
+10.) Number of arguements in less than 3
+Input ./indexer "output.txt"
+Output: Need 3 arguements
