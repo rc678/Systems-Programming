@@ -352,12 +352,12 @@ int split(FILE* file, char* fileName) {
 		HASH_ADD_KEYPTR(hh, words, token,strlen(token), s);	
 	}
 
-	//HASH_FIND_STR(words, token, s);
+	/*HASH_FIND_STR(words, token, s);*/
 	/*printf("token before while is %s\n", token);*/
-	//if(s) printf("token's frequency is%d\n", s->list->frequency);	
+	/*if(s) printf("token's frequency is%d\n", s->list->frequency);	*/
 	while(token != NULL)
 	{
-		//printf("token is %s\n", token);	
+		/*printf("token is %s\n", token);	*/
 		token = TKGetNextToken(t);
 		HASH_FIND_STR(words, token, s);
 		printf("token is %s\n", token);
@@ -375,7 +375,7 @@ int split(FILE* file, char* fileName) {
 		}
 		if(s)
 		{
-			//traverse list and change frequency
+			/*traverse list and change frequency*/
 			break;
 		}
 	}
