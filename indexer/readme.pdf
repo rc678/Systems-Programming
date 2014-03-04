@@ -1,0 +1,11 @@
+Our implementation involves using an external macros called uthash that allows us to create, insert, and iterate through a hashtable. We first begin by accessing a file or a directory with many files. After we have found a file to be read, we use tokenizer.c to tokenize the files and insert the words into a hashtable. We insert all the words from every text file into the hashtable. Once the hashtable has been built, we iterate through the hashtable and write all the words and their list of file names and frequencies into an output text file.  
+
+The first step involves accessing all the files in an existing directory. The best case running time of accessing the files is O(1) and this occurs when there is only one file to be read with no directories. The worst case running time of accessing the files is O(n + k), where n is the number of directories and k is number of text filess. Big O(n+k) occurs when there are n directories and k files to be read. 
+
+When reading a file and tokenizing the words, the best case and worst case running time is O(x), where x is the number of words in the file. 
+
+The running time of inserting the words and their values into a hashtable is worst case big O(xg), where there are x words that are tokenized and g nodes to be traversed in the linked list that holds the file name and their frequency of occurrence.
+
+The running time of writing to a file is also worst case big O(xg) because we have to go through every word and read all the nodes in the linked list of that word. 
+
+The overall running time of our program is O((n + k)(xg)) because we have to read and write n+k directories which contain x words with a possibility of g nodes in the linked list. Therefore, the worst case and best case big O running time of our program is O((n+k)(xg)). 
