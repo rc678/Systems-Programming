@@ -375,7 +375,11 @@ int split(FILE* file, char* fileName) {
 
 
 	for(s=words; s != NULL; s=s->hh.next) {
-		printf("word is %s: file is %s: frequency is %d\n", s->word, s->list->fileName, s->list->frequency);
+		printf("<list> %s\n", s->word);
+		for (temp = s->list; temp != NULL; temp = temp->next){
+			printf("(%s, %d) ", temp->fileName, temp->frequency);
+		}
+		printf("\n</list>\n");
 	}
 	/*printf("outside of loop\n");*/
 
