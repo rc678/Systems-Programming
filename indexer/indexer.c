@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h>/*functions to go through directories*/
+#include <dirent.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <errno.h>
 #include <string.h>
-#include "uthash.h"
+#include "uthash.h"/*Copyright (c) 2005-2014, Troy D. Hanson  http://troydhanson.github.com/uthash/ All rights reserved.*/
 #include "tokenizer.c"
 
-
+/*Used to store the names of the files in a linked list. It is used as the value in the hash table*/
 typedef struct record{
 	char* fileName;
 	int frequency;
@@ -17,38 +18,43 @@ typedef struct record{
 
 }record, *recordPtr;
 
+/*Hashtable struct where word is the key and list is the value*/
 struct my_struct{
 	const char* word; 
 	recordPtr list;
-	UT_hash_handle hh;
+	UT_hash_handle hh;/*external macros*/
 };
 
+/*function prototypes*/
 void split(FILE*, char*);
 recordPtr updateRecordList(recordPtr, char*);
 recordPtr resortRecordList(recordPtr, recordPtr);
 
+/*global hashtable struct*/
 struct my_struct* words; 
 
+/*sorts all the keys in the hashtable*/
 int name_sort(struct my_struct* a, struct my_struct* b)
 {
 	return strcmp(a->word, b->word);
 }
 
+/*calls a function that sorts the keys in a hashtable*/
 void sort_by_name()
 {
 	HASH_SORT(words, name_sort);
 }
 
-/*returns a 1 if the file is a directory*/ 
+/*Goes through the directories recursively and returns the directory*/ 
 int validFile(const char* parent, char* name)
 {
 	struct stat statbuf; 
 	char* path = malloc(strlen(name) + strlen(parent) + 2);
-	//	printf("parent is %s name is %s\n", parent, name);
 	sprintf(path, "%s%s", parent, name);
 	stat(path, &statbuf);
 	return S_ISDIR(statbuf.st_mode); 
 }
+
 /*Recursively indexes all the files in a directory. Returns 1 if successful in indexing and 0 if not.*/
 int readFiles(char* dir)
 {
@@ -61,34 +67,25 @@ int readFiles(char* dir)
 	FILE* currFile;
 	struct my_struct* s = NULL; 
 
-	/*if user enter the name of a directory or file that does not exist*/
+	/*if the user enters the name of a directory or file that does not exist*/
 	if(stat(dir, &statbuf) == -1)
 	{
 		printf("dir is %s\n", dir);
 		return 0;
 	}
 
-	//printf("DIR IS %s\n", dir);
+	/*checks if dir is currently on a file. If it is a file, then open the file and call split.*/
 	if(S_ISREG(statbuf.st_mode))
 	{
-		//	printf("in here and file name is %s\n", dir);
 		currFile = fopen(dir, "r");
 		if(currFile != NULL)
 		{
-			//printf("FILE OPENED PROPERLY\n");
-			/*FILE IS NOW OPEN. WRITE CODE TO INDEX FILE HERE*/
 			split(currFile, dir);
-			/*for(s=words; s != NULL; s=s->hh.next) {
-			  printf("<list> %s\n", s->word);
-			  for (temp = s->list; temp != NULL; temp = temp->next){
-			  printf("(%s, %d) ", temp->fileName, temp->frequency);
-			  }
-			  printf("\n</list>\n");
-			  }*/
 		}
 		return 0;
 	}
 
+	/*checks if dir is currently a directory*/
 	if(S_ISDIR(statbuf.st_mode)){
 		directory = opendir(dir);
 
@@ -114,8 +111,8 @@ int readFiles(char* dir)
 }
 
 /*This function will start the process of Tokenizing the string from the file
- *  *  *  * *It will return a 1 if successfully split and a 0 otherwise.
- *   *   *   * */ 
+*It will return a 1 if successfully split and a 0 otherwise.
+*/ 
 void split(FILE* file, char* fileName) {
 
 	if(file == NULL)
@@ -140,6 +137,8 @@ void split(FILE* file, char* fileName) {
 	int len = strlen(fileName);
 	char* fptr = (char*)malloc(len);
 	strcpy(fptr, fileName);
+
+	/*tokenizes the string and adds them to the hashtable called words*/
 	while(token != NULL)
 	{
 		HASH_FIND(hh, words, token, strlen(token), s);
@@ -240,6 +239,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
+	struct stat info; 
 	char choice[10];
 	struct my_struct* s;
 	recordPtr temp;
@@ -247,13 +247,24 @@ int main(int argc, char** argv)
 	FILE* output;
 	if(dir == NULL)
 	{
-		printf("directory is NULL\n");
+		printf("directory does not exist\n");
 		return 0;
-	}	
+	}
+	if(stat(dir,&info) != 0)
+	{
+		if(errno == ENOENT)/*file doesn not exist*/
+		{
+			printf("file/directory does not exist\n");
+			return 0;	
+		}
+		if(errno == EACCES)/*we don't have permission to read a file*/
+		{
+			printf("no permission to read the file\n");
+			return 0;
+		}
+	}
 	readFiles(dir);
 	sort_by_name();
-
-
 	if(access(argv[1], F_OK) != -1)
 	{
 		fputs("Enter 1 to overwrite file or 0 to quit: ", stdout);
@@ -278,7 +289,7 @@ int main(int argc, char** argv)
 						for (temp = s->list; temp != NULL; temp = temp->next){
 							fprintf(output,"%s %d ", temp->fileName, temp->frequency);
 						}
-						fprintf(output,"\n</list>\n\n");
+						fprintf(output,"\n</list>\n");
 					}
 				}
 			}
