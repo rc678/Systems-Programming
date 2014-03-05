@@ -28,6 +28,17 @@ recordPtr updateRecordList(recordPtr, char*);
 recordPtr resortRecordList(recordPtr, recordPtr);
 
 struct my_struct* words; 
+
+int name_sort(struct my_struct* a, struct my_struct* b)
+{
+	return strcmp(a->word, b->word);
+}
+
+void sort_by_name()
+{
+	HASH_SORT(words, name_sort);
+}
+
 /*returns a 1 if the file is a directory*/ 
 int validFile(const char* parent, char* name)
 {
@@ -67,13 +78,13 @@ int readFiles(char* dir)
 			//printf("FILE OPENED PROPERLY\n");
 			/*FILE IS NOW OPEN. WRITE CODE TO INDEX FILE HERE*/
 			split(currFile, dir);
-			for(s=words; s != NULL; s=s->hh.next) {
+			/*for(s=words; s != NULL; s=s->hh.next) {
 				printf("<list> %s\n", s->word);
 				for (temp = s->list; temp != NULL; temp = temp->next){
 					printf("(%s, %d) ", temp->fileName, temp->frequency);
 				}
 				printf("\n</list>\n");
-			}
+			}*/
 		}
 		return 0;
 	}
@@ -218,7 +229,6 @@ recordPtr resortRecordList(recordPtr head, recordPtr curr)
 	return head;	
 }
 
-
 int main(int argc, char** argv)
 {
 	/*argv[1] is the inverted-index file name. It gives the name of the file you should create to hold your inverted index*/
@@ -233,19 +243,24 @@ int main(int argc, char** argv)
 	struct my_struct* s;
 	recordPtr temp;
 	char* dir = argv[2];
+	FILE* output;
 	if(dir == NULL)
 	{
 		printf("directory is NULL\n");
 		return 0;
 	}	
 	readFiles(dir);
+	sort_by_name();
 
-	/*for(s=words; s != NULL; s=s->hh.next) {
-	  printf("<list> %s\n", s->word);
+	
+	output = fopen(argv[1], "a+");
+
+	for(s=words; s != NULL; s=s->hh.next) {
+	  fprintf(output, "<list> %s\n", s->word);
 	  for (temp = s->list; temp != NULL; temp = temp->next){
-	  printf("(%s, %d) ", temp->fileName, temp->frequency);
+	  fprintf(output,"<%s, %d>", temp->fileName, temp->frequency);
 	  }
-	  printf("\n</list>\n");
-	  }*/
+	  fprintf(output,"\n</list>\n");
+	  }
 }
 
