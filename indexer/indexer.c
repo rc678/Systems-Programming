@@ -79,12 +79,12 @@ int readFiles(char* dir)
 			/*FILE IS NOW OPEN. WRITE CODE TO INDEX FILE HERE*/
 			split(currFile, dir);
 			/*for(s=words; s != NULL; s=s->hh.next) {
-				printf("<list> %s\n", s->word);
-				for (temp = s->list; temp != NULL; temp = temp->next){
-					printf("(%s, %d) ", temp->fileName, temp->frequency);
-				}
-				printf("\n</list>\n");
-			}*/
+			  printf("<list> %s\n", s->word);
+			  for (temp = s->list; temp != NULL; temp = temp->next){
+			  printf("(%s, %d) ", temp->fileName, temp->frequency);
+			  }
+			  printf("\n</list>\n");
+			  }*/
 		}
 		return 0;
 	}
@@ -240,6 +240,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
+	char choice[10];
 	struct my_struct* s;
 	recordPtr temp;
 	char* dir = argv[2];
@@ -252,15 +253,46 @@ int main(int argc, char** argv)
 	readFiles(dir);
 	sort_by_name();
 
-	
-	output = fopen(argv[1], "a+");
+
+	if(access(argv[1], F_OK) != -1)
+	{
+		fputs("Enter 1 to overwrite file or 0 to quit: ", stdout);
+		fflush(stdout);
+		if(fgets(choice, sizeof choice, stdin))
+		{
+			int num; 
+			if(sscanf(choice, "%d", &num))
+			{
+
+				if(num == 0)/*file exists, but you do not want to overwrite it*/
+				{
+					printf("Enter a new output file\n");
+					return 0;
+				}
+				if(num == 1)/*file exists, but you want to overwrite the file*/
+				{
+					output = fopen(argv[1], "w+");
+
+					for(s=words; s != NULL; s=s->hh.next) {
+						fprintf(output, "<list> %s\n", s->word);
+						for (temp = s->list; temp != NULL; temp = temp->next){
+							fprintf(output,"%s %d ", temp->fileName, temp->frequency);
+						}
+						fprintf(output,"\n</list>\n\n");
+					}
+				}
+			}
+		}
+	}
+
+	output = fopen(argv[1], "w");
 
 	for(s=words; s != NULL; s=s->hh.next) {
-	  fprintf(output, "<list> %s\n", s->word);
-	  for (temp = s->list; temp != NULL; temp = temp->next){
-	  fprintf(output,"<%s, %d>", temp->fileName, temp->frequency);
-	  }
-	  fprintf(output,"\n</list>\n");
-	  }
-}
+		fprintf(output, "<list> %s\n", s->word);
+		for (temp = s->list; temp != NULL; temp = temp->next){
+			fprintf(output,"%s %d ", temp->fileName, temp->frequency);
+		}
+		fprintf(output,"\n</list>\n\n");
+	}	
+}/*end of main*/
 
