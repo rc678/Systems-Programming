@@ -27,13 +27,13 @@ void split(FILE*, char*);
 recordPtr updateRecordList(recordPtr, char*);
 recordPtr resortRecordList(recordPtr, recordPtr);
 
-struct my_struct* words = NULL; 
+struct my_struct* words; 
 /*returns a 1 if the file is a directory*/ 
 int validFile(const char* parent, char* name)
 {
 	struct stat statbuf; 
 	char* path = malloc(strlen(name) + strlen(parent) + 2);
-	/*	printf("parent is %s name is %s\n", parent, name);*/
+	//	printf("parent is %s name is %s\n", parent, name);
 	sprintf(path, "%s%s", parent, name);
 	stat(path, &statbuf);
 	return S_ISDIR(statbuf.st_mode); 
@@ -47,7 +47,8 @@ int readFiles(char* dir)
 	struct stat statbuf;
 	char* name; 
 	stat(dir, &statbuf);
-	FILE* currFile; 
+	FILE* currFile;
+	struct my_struct* s = NULL; 
 
 	/*if user enter the name of a directory or file that does not exist*/
 	if(stat(dir, &statbuf) == -1)
@@ -56,16 +57,23 @@ int readFiles(char* dir)
 		return 0;
 	}
 
-	/*printf("DIR IS %s\n", dir);*/
+	//printf("DIR IS %s\n", dir);
 	if(S_ISREG(statbuf.st_mode))
 	{
-		/*	printf("in here and file name is %s\n", dir);*/
+		//	printf("in here and file name is %s\n", dir);
 		currFile = fopen(dir, "r");
 		if(currFile != NULL)
 		{
-			/*printf("FILE OPENED PROPERLY\n");*/
+			//printf("FILE OPENED PROPERLY\n");
 			/*FILE IS NOW OPEN. WRITE CODE TO INDEX FILE HERE*/
 			split(currFile, dir);
+			for(s=words; s != NULL; s=s->hh.next) {
+				printf("<list> %s\n", s->word);
+				for (temp = s->list; temp != NULL; temp = temp->next){
+					printf("(%s, %d) ", temp->fileName, temp->frequency);
+				}
+				printf("\n</list>\n");
+			}
 		}
 		return 0;
 	}
@@ -106,7 +114,10 @@ void split(FILE* file, char* fileName) {
 
 	char* token;
 	recordPtr temp; 
+	recordPtr a;
+	recordPtr z;  
 	struct my_struct *s =  NULL;
+	struct my_struct *r = NULL;
 
 	char str[1000000];
 	fgets(str, 10000, file);
@@ -115,42 +126,33 @@ void split(FILE* file, char* fileName) {
 	TokenizerT* t = TKCreate(st);
 	token = TKGetNextToken(t);
 
-	/*HASH_FIND_STR(words, token, s);*/
-	/*printf("token before while is %s\n", token);*/
-	/*if(s) printf("token's frequency is%d\n", s->list->frequency);	*/
+	int len = strlen(fileName);
+	char* fptr = (char*)malloc(len);
+	strcpy(fptr, fileName);
 	while(token != NULL)
 	{
-		/*printf("token is %s\n", token);	*/
-		HASH_FIND_STR(words, token, s);
-
-		if(!s)
+		HASH_FIND(hh, words, token, strlen(token), s);
+		if(s)
 		{
+			z = s->list; 
+			s->list = updateRecordList(z, fptr);
+		}else{
+			printf("not in s\n");
 			s = (struct my_struct*)malloc(sizeof(struct my_struct));
 			s->word = token;
-			temp = (recordPtr)malloc(sizeof(struct record));
-			temp->fileName = fileName;
-			temp->frequency = 1;
-			temp->next = NULL;
-			temp->prev = NULL;
-			s->list = temp;
+			recordPtr add = (recordPtr)malloc(sizeof(struct record));
+			add->fileName = fptr;
+			add->frequency = 1;
+			add->next = NULL;
+			add->prev = NULL;
+			s->list = add;
 			HASH_ADD_KEYPTR(hh, words, token, strlen(token), s);
-		}else{
-			s->list = updateRecordList(s->list, fileName);
 		}
 
 		token = TKGetNextToken(t);
 	}
-
-
-	for(s=words; s != NULL; s=s->hh.next) {
-	  printf("<list> %s\n", s->word);
-	  for (temp = s->list; temp != NULL; temp = temp->next){
-	  printf("(%s, %d) ", temp->fileName, temp->frequency);
-	  }
-	  printf("\n</list>\n");
-	  }
-	/*printf("outside of loop\n");*/
 }
+
 
 recordPtr updateRecordList(recordPtr head, char* fname)
 {
@@ -238,14 +240,12 @@ int main(int argc, char** argv)
 	}	
 	readFiles(dir);
 
-	printf("LAKCAC\n");
-	for(s=words; s != NULL; s=s->hh.next) {
-		printf("<list> %s\n", s->word);
-		for (temp = s->list; temp != NULL; temp = temp->next){
-			printf("(%s, %d) ", temp->fileName, temp->frequency);
-		}
-		printf("\n</list>\n");
-	}
-
+	/*for(s=words; s != NULL; s=s->hh.next) {
+	  printf("<list> %s\n", s->word);
+	  for (temp = s->list; temp != NULL; temp = temp->next){
+	  printf("(%s, %d) ", temp->fileName, temp->frequency);
+	  }
+	  printf("\n</list>\n");
+	  }*/
 }
 
