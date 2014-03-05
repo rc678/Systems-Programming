@@ -33,7 +33,7 @@ int validFile(const char* parent, char* name)
 {
 	struct stat statbuf; 
 	char* path = malloc(strlen(name) + strlen(parent) + 2);
-	//	printf("parent is %s name is %s\n", parent, name);
+	/*	printf("parent is %s name is %s\n", parent, name);*/
 	sprintf(path, "%s%s", parent, name);
 	stat(path, &statbuf);
 	return S_ISDIR(statbuf.st_mode); 
@@ -56,14 +56,14 @@ int readFiles(char* dir)
 		return 0;
 	}
 
-	//printf("DIR IS %s\n", dir);
+	/*printf("DIR IS %s\n", dir);*/
 	if(S_ISREG(statbuf.st_mode))
 	{
-		//	printf("in here and file name is %s\n", dir);
+		/*	printf("in here and file name is %s\n", dir);*/
 		currFile = fopen(dir, "r");
 		if(currFile != NULL)
 		{
-			//printf("FILE OPENED PROPERLY\n");
+			/*printf("FILE OPENED PROPERLY\n");*/
 			/*FILE IS NOW OPEN. WRITE CODE TO INDEX FILE HERE*/
 			split(currFile, dir);
 		}
