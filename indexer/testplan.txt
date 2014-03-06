@@ -21,7 +21,7 @@ input.txt 1
 2.) Input file does not exist
 Input: ./index "output.txt" "lala.txt"
 
-Output: NULL
+Output: file/directory does not exist
 
 3.) Input file has repeating words
 Input: ./index "output.txt" "input2.txt"
@@ -83,12 +83,12 @@ tests2/subdirectoryA/InputAA.txt 1
 tests2/InputA.txt 2 tests2/subdirectoryA/subdirectoryAA/InputAAA.txt 1
 </list>
 
-<list> red11
-tests2/subdirectoryA/InputAA.txt 1
+<list> red
+tests2/InputA.txt 2 tests2/subdirectoryA/subdirectoryAA/InputAAA.txt 2
 </list>
 
-<list>red
-tests2/InputA.txt 2 tests2/subdirectoryA/subdirectoryAA/InputAAA.txt 2
+<list> red11
+tests2/subdirectoryA/InputAA.txt 1
 </list>
 
 6.) Input text document has escape characters
@@ -105,11 +105,11 @@ escape.txt 1
 7.) Input directory does not exist
 Input ./index "output.txt" "lala"
 
-Output: NULL (directory does not exist)
+Output: file/directory does not exist
 
 8.) Writing to a file that already exists
 Input: ./index "output.txt" "input.txt"
-Output: Enter 2 to overwrite file or 0 to quit
+Output: Enter 1 to overwrite file or 0 to quit
 
 9.) Number of arguements is greater than 3
 Input: ./index "output.txt" "input.txt" "input.txt"
@@ -118,3 +118,12 @@ Output: Need 3 arguements
 10.) Number of arguements in less than 3
 Input ./index "output.txt"
 Output: Need 3 arguements
+
+11.) Input file has multiple files with the same word.
+Input ./index "output.txt" "a"
+Output: 
+
+<list> the
+a/aaaa.txt 1 a/aaa.txt 1 a/aa.txt 1 a/aaaaaa.txt 1 a/a.txt 1 
+a/aaaaa.txt 1 
+</list>
