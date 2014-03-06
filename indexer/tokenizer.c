@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "uthash.h"
+#include "uthash.h" /*Copyright (c) 2005-2014, Troy D. Hanson  http://troydhanson.github.com/uthash/ All rights reserved.*/
 
 #define MAX_HEX_CHARS 2
 #define MAX_OCT_CHARS 3
