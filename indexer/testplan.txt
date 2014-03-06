@@ -91,14 +91,14 @@ tests2/InputA.txt 2 tests2/subdirectoryA/subdirectoryAA/InputAAA.txt 2
 tests2/subdirectoryA/InputAA.txt 1
 </list>
 
-6.) Input text document has escape characters
+6.) Input text document has charcters that look like escape characters
 Input ./index "output.txt" "escape.txt"
 Output: 
 <list> hello
 escape.txt 1
 </list>
 
-<list> world
+<list> nworld
 escape.txt 1
 </list>
 
