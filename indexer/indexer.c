@@ -100,9 +100,9 @@ int readFiles(char* dir)
 }
 
 /*This function will tokenize the file, add all new distinct words to the hash table, and call functions to update
-  *the lists of records when a tokenized word is already in the hashtable.
-  *The arguments are a file pointer and relative path name of the file.
-  */ 
+ *the lists of records when a tokenized word is already in the hashtable.
+ *The arguments are a file pointer and relative path name of the file.
+ */ 
 void split(FILE* file, char* fileName) {
 
 	if(file == NULL)
@@ -153,9 +153,9 @@ void split(FILE* file, char* fileName) {
 }
 
 /*This function updates the sorted list of records for a word as necessary.
-  *Arguments: pointer to the head of the list and the relative name of the file
-  *Returns a record pointer to the head of the newly updated list
-  */
+ *Arguments: pointer to the head of the list and the relative name of the file
+ *Returns a record pointer to the head of the newly updated list
+ */
 recordPtr updateRecordList(recordPtr head, char* fname)
 {
 	recordPtr temp = head; /*pointer to the current head of the list*/
@@ -186,9 +186,9 @@ recordPtr updateRecordList(recordPtr head, char* fname)
 }
 
 /*This function re-sorts a list of records when one record's frequency has been incremented.
-  *Arguments: pointer to the current head of the list and pointer to the incremented record
-  *Returns pointer to the head of the updated list
-  */
+ *Arguments: pointer to the current head of the list and pointer to the incremented record
+ *Returns pointer to the head of the updated list
+ */
 recordPtr resortRecordList(recordPtr head, recordPtr curr)
 {
 	/*If the incremented record is already the head, don't change anything*/
@@ -230,6 +230,7 @@ recordPtr resortRecordList(recordPtr head, recordPtr curr)
 	return head;	
 }
 
+
 int main(int argc, char** argv)
 {
 	/*argv[1] is the inverted-index file name. It gives the name of the file you should create to hold your inverted index*/
@@ -240,7 +241,7 @@ int main(int argc, char** argv)
 		printf("Too few arguments\n");
 		return 0;
 	}
-	
+
 	if(argc > 3)
 	{
 		printf("Too many arguments\n");
@@ -250,6 +251,7 @@ int main(int argc, char** argv)
 	struct stat info; 
 	char choice[2];
 	struct my_struct* s;
+	struct my_struct* tmp;
 	recordPtr temp;
 	char* dir = argv[2];
 	FILE* output;
@@ -329,6 +331,12 @@ int main(int argc, char** argv)
 		}
 		counter = 0;
 		fprintf(output,"\n</list>\n");
-	}	
+	}
+
+	HASH_ITER(hh, words, s, tmp) {
+		HASH_DEL(words, s);
+		free(s);
+	}
+	return 1;	
 }/*end of main*/
 
