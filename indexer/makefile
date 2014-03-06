@@ -1,10 +1,8 @@
 all: index
 
-tokenizer.o: tokenizer.c
+tokenizer.o: tokenizer.c uthash.h
 	gcc -c tokenizer.c
-sorted-list.o: sorted-list.c
-	gcc -c sorted-list.c
-indexer.o: indexer.c
+indexer.o: indexer.c uthash.h
 	gcc -c indexer.c
 index: indexer.o
 	gcc -o index indexer.o
