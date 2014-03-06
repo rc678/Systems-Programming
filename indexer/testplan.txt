@@ -104,7 +104,6 @@ escape.txt 1
 
 7.) Input directory does not exist
 Input ./index "output.txt" "lala"
-
 Output: file/directory does not exist
 
 8.) Writing to a file that already exists
@@ -113,11 +112,11 @@ Output: Enter 1 to overwrite file or 0 to quit
 
 9.) Number of arguements is greater than 3
 Input: ./index "output.txt" "input.txt" "input.txt"
-Output: Need 3 arguements
+Output: "Too many arguments"
 
-10.) Number of arguements in less than 3
+10.) Number of arguements is less than 3
 Input ./index "output.txt"
-Output: Need 3 arguements
+Output: "Too few arguments"
 
 11.) Input directory has multiple files with the same word.
 Input ./index "output.txt" "a"
