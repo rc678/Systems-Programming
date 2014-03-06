@@ -9,20 +9,20 @@
 #include "uthash.h"/*Copyright (c) 2005-2014, Troy D. Hanson  http://troydhanson.github.com/uthash/ All rights reserved.*/
 #include "tokenizer.c"
 
-/*Used to store the names of the files in a linked list. It is used as the value in the hash table*/
+/*Node type struct used to store the records in a sorted linked list at each index of the hashtable*/
 typedef struct record{
-	char* fileName;
-	int frequency;
+	char* fileName; /*stores the relative name of the file*/
+	int frequency; /*stores the frequency of a distinct word in the file*/
 	struct record *next;
 	struct record *prev;
 
 }record, *recordPtr;
 
-/*Hashtable struct where word is the key and list is the value*/
+/*Hashtable struct to store distinct words and the records associated with them*/
 struct my_struct{
-	const char* word; 
-	recordPtr list;
-	UT_hash_handle hh;/*external macros*/
+	const char* word; /*the distinct word that is used as the key*/
+	recordPtr list; /*value is a recordptr to a sorted list of records*/
+	UT_hash_handle hh; /*external macros*/
 };
 
 /*function prototypes*/
@@ -39,20 +39,10 @@ int name_sort(struct my_struct* a, struct my_struct* b)
 	return strcmp(a->word, b->word);
 }
 
-/*calls a function that sorts the keys in a hashtable*/
+/*calls a function that compares the keys in a hashtable and sorts them*/
 void sort_by_name()
 {
 	HASH_SORT(words, name_sort);
-}
-
-/*Goes through the directories recursively and returns the directory*/ 
-int validFile(const char* parent, char* name)
-{
-	struct stat statbuf; 
-	char* path = malloc(strlen(name) + strlen(parent) + 2);
-	sprintf(path, "%s%s", parent, name);
-	stat(path, &statbuf);
-	return S_ISDIR(statbuf.st_mode); 
 }
 
 /*Recursively indexes all the files in a directory. Returns 1 if successful in indexing and 0 if not.*/
@@ -110,8 +100,12 @@ int readFiles(char* dir)
 
 }
 
-/*This function will start the process of Tokenizing the string from the file
-*It will return a 1 if successfully split and a 0 otherwise.
+/*This function will tokenize the file, add all new distinct words to the hash table, and call functions to update
+*the lists of records when a tokenized word is already in the hashtable.
+*
+*The arguments are a file pointer and relative path name of the file.
+*
+*Return value is 1 if successfully split and 0 otherwise.
 */ 
 void split(FILE* file, char* fileName) {
 
@@ -163,12 +157,18 @@ void split(FILE* file, char* fileName) {
 	}
 }
 
-
+/*This function updates the sorted list of records for a word as necessary.
+*
+*Arguments: pointer to the head of the list and the relative name of the file
+*Returns a record pointer to the head of the newly updated list
+*/
 recordPtr updateRecordList(recordPtr head, char* fname)
 {
-	recordPtr temp = head;
-	recordPtr curr = head;
+	recordPtr temp = head; /*pointer to the current head of the list*/
+	recordPtr curr = head; /*pointer to traverse the list for the proper record*/
 
+	/*Search the list for a record with a matching file name. If it is found, increment the frequency
+	and call resortRecordList*/
 	while (curr){
 		if (strcmp(fname, curr->fileName) == 0){
 			curr->frequency++;
@@ -180,6 +180,8 @@ recordPtr updateRecordList(recordPtr head, char* fname)
 		curr = curr->next;
 	}
 
+	/*If no matching file name is found, malloc and initialize a new record with a frequency of 1 for 
+	this file and attach it to the end of the list*/
 	recordPtr newRecord = (recordPtr)malloc(sizeof(struct record));
 	newRecord->frequency = 1;
 	newRecord->fileName = fname;
@@ -189,15 +191,21 @@ recordPtr updateRecordList(recordPtr head, char* fname)
 	return head;
 }
 
-
+/*This function re-sorts a list of records when one record's frequency has been incremented.
+*
+*Arguments: pointer to the current head of the list and pointer to the incremented record
+*Returns pointer to the head of the updated list
+*/
 recordPtr resortRecordList(recordPtr head, recordPtr curr)
 {
+	/*If the incremented record is already the head, don't change anything*/
 	if (curr == head){
 		return head;
 	}
 
-	recordPtr temp = curr->prev;
+	recordPtr temp = curr->prev; /*Pointer to traverse backwards through the list*/
 
+	/*Move the incremented record up the list until the previous node has the same or higher frequency*/
 	while (temp->prev){
 		if (curr->frequency > temp->frequency){
 			temp->next = curr->next;
@@ -214,6 +222,7 @@ recordPtr resortRecordList(recordPtr head, recordPtr curr)
 		}
 	}
 
+	/*If the incremented record now has the highest frequency in the list, make it the head and return it*/
 	if (temp == head && curr->frequency > temp->frequency){
 		temp->next = curr->next;
 		if (curr->next){
