@@ -8,4 +8,4 @@ The running time of inserting the words and their values into a hashtable is wor
 
 The running time of writing to a file is worst case big O(m + g), where m is the number of distinct words tokenized and g is the number of records traversed altogether.
 
-The overall running time of our program in the worst case is O(xg) since xg is more significant than m + g and n + k. Note that x is the number of words tokenized and g is the number of records altogether. In the best case, the running time of the program is O(x), when each word added is distinct and no sorting of records is required.
+Much of the memory used in our program is used to store the keys and their values in the hashtable. The overall running time of our program in the worst case is O(xg) since xg is more significant than m + g and n + k. Note that x is the number of words tokenized and g is the number of records altogether. In the best case, the running time of the program is O(x), when each word added is distinct and no sorting of records is required.
