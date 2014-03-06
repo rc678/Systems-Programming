@@ -86,7 +86,6 @@ int readFiles(char* dir)
 			{
 				continue; 
 			}
-			printf("%s\n", file->d_name);
 			char* nextFile = malloc(strlen(dir) + strlen(name) + 1);
 			sprintf(nextFile, "%s/%s", dir, name);
 			readFiles(nextFile);
@@ -101,12 +100,9 @@ int readFiles(char* dir)
 }
 
 /*This function will tokenize the file, add all new distinct words to the hash table, and call functions to update
-*the lists of records when a tokenized word is already in the hashtable.
-*
-*The arguments are a file pointer and relative path name of the file.
-*
-*Return value is 1 if successfully split and 0 otherwise.
-*/ 
+  *the lists of records when a tokenized word is already in the hashtable.
+  *The arguments are a file pointer and relative path name of the file.
+  */ 
 void split(FILE* file, char* fileName) {
 
 	if(file == NULL)
@@ -136,12 +132,11 @@ void split(FILE* file, char* fileName) {
 	while(token != NULL)
 	{
 		HASH_FIND(hh, words, token, strlen(token), s);
-		if(s)
+		if(s)/*if the token is in the hashtable*/
 		{
 			z = s->list; 
 			s->list = updateRecordList(z, fptr);
-		}else{
-			printf("not in s\n");
+		}else{/*if the token is not in the hashtable*/
 			s = (struct my_struct*)malloc(sizeof(struct my_struct));
 			s->word = token;
 			recordPtr add = (recordPtr)malloc(sizeof(struct record));
@@ -158,17 +153,16 @@ void split(FILE* file, char* fileName) {
 }
 
 /*This function updates the sorted list of records for a word as necessary.
-*
-*Arguments: pointer to the head of the list and the relative name of the file
-*Returns a record pointer to the head of the newly updated list
-*/
+  *Arguments: pointer to the head of the list and the relative name of the file
+  *Returns a record pointer to the head of the newly updated list
+  */
 recordPtr updateRecordList(recordPtr head, char* fname)
 {
 	recordPtr temp = head; /*pointer to the current head of the list*/
 	recordPtr curr = head; /*pointer to traverse the list for the proper record*/
 
 	/*Search the list for a record with a matching file name. If it is found, increment the frequency
-	and call resortRecordList*/
+	 * 	and call resortRecordList*/
 	while (curr){
 		if (strcmp(fname, curr->fileName) == 0){
 			curr->frequency++;
@@ -181,7 +175,7 @@ recordPtr updateRecordList(recordPtr head, char* fname)
 	}
 
 	/*If no matching file name is found, malloc and initialize a new record with a frequency of 1 for 
-	this file and attach it to the end of the list*/
+	 * 	this file and attach it to the end of the list*/
 	recordPtr newRecord = (recordPtr)malloc(sizeof(struct record));
 	newRecord->frequency = 1;
 	newRecord->fileName = fname;
@@ -192,10 +186,9 @@ recordPtr updateRecordList(recordPtr head, char* fname)
 }
 
 /*This function re-sorts a list of records when one record's frequency has been incremented.
-*
-*Arguments: pointer to the current head of the list and pointer to the incremented record
-*Returns pointer to the head of the updated list
-*/
+  *Arguments: pointer to the current head of the list and pointer to the incremented record
+  *Returns pointer to the head of the updated list
+  */
 recordPtr resortRecordList(recordPtr head, recordPtr curr)
 {
 	/*If the incremented record is already the head, don't change anything*/
@@ -249,11 +242,12 @@ int main(int argc, char** argv)
 	}
 
 	struct stat info; 
-	char choice[10];
+	char choice[2];
 	struct my_struct* s;
 	recordPtr temp;
 	char* dir = argv[2];
 	FILE* output;
+	int counter = 0;
 	if(dir == NULL)
 	{
 		printf("directory does not exist\n");
@@ -296,10 +290,18 @@ int main(int argc, char** argv)
 					for(s=words; s != NULL; s=s->hh.next) {
 						fprintf(output, "<list> %s\n", s->word);
 						for (temp = s->list; temp != NULL; temp = temp->next){
+							if(counter == 5)
+							{
+								counter = 0;
+								fprintf(output,"\n");
+							}
 							fprintf(output,"%s %d ", temp->fileName, temp->frequency);
+							counter++;
 						}
+						counter = 0;
 						fprintf(output,"\n</list>\n");
 					}
+					return 1;
 				}
 			}
 		}
@@ -307,12 +309,20 @@ int main(int argc, char** argv)
 
 	output = fopen(argv[1], "w");
 
+	/*writes to a file if the output file does not already exist*/
 	for(s=words; s != NULL; s=s->hh.next) {
 		fprintf(output, "<list> %s\n", s->word);
 		for (temp = s->list; temp != NULL; temp = temp->next){
+			if(counter == 5)
+			{
+				counter = 0;
+				fprintf(output,"\n");
+			}
 			fprintf(output,"%s %d ", temp->fileName, temp->frequency);
+			counter++;
 		}
-		fprintf(output,"\n</list>\n\n");
+		counter = 0;
+		fprintf(output,"\n</list>\n");
 	}	
 }/*end of main*/
 
