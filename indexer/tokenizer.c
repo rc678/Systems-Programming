@@ -212,7 +212,7 @@ void TKDestroy(TokenizerT *tk) {
 	return;
 }
 
-
+/*This function reads a string token and converts any capital letter to lower case*/
 char* toLowerCase(char *token){
 
 	char *ch;
@@ -228,7 +228,7 @@ char* toLowerCase(char *token){
 	return token;
 }
 
-
+/*This function returns 0 if the input character is a letter or a number, and returns 1 otherwise*/
 char is_delimiter(char character) {
 
 	/*
