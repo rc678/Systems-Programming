@@ -127,3 +127,7 @@ Output:
 a/aaaa.txt 1 a/aaa.txt 1 a/aa.txt 1 a/aaaaaa.txt 1 a/a.txt 1 
 a/aaaaa.txt 1 
 </list>
+
+12.) Directory has no text files.
+Input: ./index "output.txt" "empty"
+Output: <writes to output.txt which is empty>
