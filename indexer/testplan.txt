@@ -131,3 +131,13 @@ a/aaaaa.txt 1
 12.) Directory has no text files.
 Input: ./index "output.txt" "empty"
 Output: <writes to output.txt which is empty>
+
+13.) File had many non-alphanumeric characters
+Input: ./inded "output.txt" "non.txt"
+Output:
+<list> cat
+non.txt 1
+</list>
+<list> the
+non.txt 1
+</list>
