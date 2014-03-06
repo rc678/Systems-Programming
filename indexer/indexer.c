@@ -235,9 +235,15 @@ int main(int argc, char** argv)
 	/*argv[1] is the inverted-index file name. It gives the name of the file you should create to hold your inverted index*/
 	/*argv[2] gives the name or directory that your program should index*/
 
-	if(argc != 3)
+	if(argc < 3)
 	{
-		printf("Need 3 arguements\n");
+		printf("Too few arguments\n");
+		return 0;
+	}
+	
+	if(argc > 3)
+	{
+		printf("Too many arguments\n");
 		return 0;
 	}
 
