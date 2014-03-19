@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 	int i = 0;
 	int j = 0;	
 	int tokenCounter = 0;
-	
+	int len = 0;
 	while(1)
 	{
 		fputs("Enter search query\n", stdout);
@@ -47,25 +47,36 @@ int main(int argc, char** argv)
 			token = strtok(NULL, " ");
 		}
 		i = 0;
-		tokenCounter = 0;
 		/*prints arguements*/
-		for(j = 0; j < tokenCounter; j++)
+		/*for(j = 0; j < tokenCounter; j++)
 		{
-			printf("args is %s", args[j]);
-		}
-		if(strcmp(args[0], "sa"))
+			printf("args is %s and j is %d\n", args[j], j);
+		}*/
+		len = strlen(args[0]);
+		char dest[len];
+		strncpy(dest, args[0], sizeof args[0]);
+		dest[len-1] = '\0';
+		/*for(j = 0; j < 3; j++)
 		{
+			printf("char in arg[0] is %c\n", dest[j]);
+		}*/
+		if((strcmp(dest, "sa") == 0))
+		{
+			printf("calls sa\n");
 			SA();
-		}else if(strcmp(args[0], "so")){
+			tokenCounter = 0;
+		}else if(strcmp(dest, "so") == 0){
+			
+			printf("calls so\n");
 			SO();
-		}else if(strcmp(args[0], "q")){
+			tokenCounter = 0;
+		}else if(strcmp(dest, "q") == 0){
 			break;
 		}else{
 			printf("not valid input\n");
+			tokenCounter = 0;
 			continue;
 		}
-		memset(&args[0], 0, sizeof(args));
-		
 	}
 	/*Testing purposes. Prints hashtable*/
 	/*for(s = words; s != NULL; s = s->hh.next)
