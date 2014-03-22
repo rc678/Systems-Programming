@@ -7,17 +7,23 @@
 #define BUFFER_LEN 100
 
 /*Searches all the terms in the query and prints their file names. "Logical and"*/
-void SA()
+recordPtr SA(char* word, recordPtr List)
 {
+	recordPtr head = List;	
 
+	return head;
 }
 
 /*Searches all subsets of the term and prints their file names. "Logical or"*/
-recordPtr SO(char* word)
+recordPtr SO(char* word, recordPtr fileList)
 {
-	recordPtr head;
-	printf("word in SO is %s\n", word);	
-
+	recordPtr head = fileList;
+	
+	printf("word in SO is %s\n", word);
+	if(head == NULL)
+	{
+		
+	}
 	return head;
 }
 
@@ -27,14 +33,12 @@ int main(int argc, char** argv)
 	indexFiles(dir);/*successfull indexes files and puts them into the hashtable words*/
 	struct my_struct* s;
 	struct my_struct* tmp;
-	recordPtr temp;
 	int counter = 0;
 	char line[BUFFER_LEN];
 	char** args;
 	char* arg; 
-	size_t i = 0;
+	int i = 0;
 	int j = 0;	
-	int tokenCounter = 0;
 	int len = 0;
 	int count;
 	char* token;
@@ -45,10 +49,10 @@ int main(int argc, char** argv)
 	sa = "sa";
 	char* so = (char*)malloc(3 * sizeof(char*));
 	so = "so"; 
-	int isSO = 0;
 
-	recordPtr fileList;/*will be used to keep track of the files*/
-	
+	recordPtr soFileList;/*will be used to keep track of the files for SO list*/
+	recordPtr saFileList; /*will be used to keep track of the files for SA filelist*/
+	/*infinite loop that does the constant querying*/
 	while(1)
 	{
 		fputs("Enter search query\n", stdout);
@@ -67,7 +71,6 @@ int main(int argc, char** argv)
 		while(token != NULL)
 		{
 			
-			
 			len = strlen(token) + 1;
 			arg = (char*)malloc(len * sizeof(char));
 			strcpy(arg, token);
@@ -77,33 +80,29 @@ int main(int argc, char** argv)
 				printf("it is q\n");
 				return 1;
 			}
-			if(isSO == 1)
+			if((strcmp(args[0],so) == 0) && i > 0)
 			{
-				printf("is is so\n");
-				fileList = SO(args[i]);
+				printf("calls so\n");
+				soFileList = SO(args[i], soFileList);
 			}
-			if(((strcmp(args[0],so) == 0) && isSO == 0))
+			if((strcmp(args[0],sa) == 0) && i > 0)
 			{
-				isSO = 1;
+				printf("calls sa\n");
+				saFileList = SA(args[i], saFileList);
 			}
 			i++;
-			tokenCounter++;
 			printf("token is %s\n", token);
 			token = strtok(NULL, " ");
-		}
-		for(j=0; j < 10; j++)/*assuming less than 10 entries*/
+		}/*end of inner while*/
+		/* test to cheeck what is in the array*/
+		/*for(j=0; j < 10; j++)
 		{
 			if(args[j] == NULL)
 			{
 				break;
 			}
 			printf("arg[j] is %s\n", args[j]);
-		}
-		if((strcmp(args[0],sa)) == 0)
-		{
-			printf("it is sa\n");
-			SA();
-		}
+		}*/
 	}
 	/*Testing purposes. Prints hashtable*/
 	/*for(s = words; s != NULL; s = s->hh.next)
