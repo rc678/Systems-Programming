@@ -18,11 +18,24 @@ recordPtr SA(char* word, recordPtr List)
 recordPtr SO(char* word, recordPtr fileList)
 {
 	recordPtr head = fileList;
+	struct my_struct* s;
+	struct my_struct* tmp;
 	
 	printf("word in SO is %s\n", word);
+	
+	HASH_FIND(hh, words, word, strlen(word), s);
+	if(!s){
+		printf("word not in the hashtable\n");
+		return; 
+	}
+
 	if(head == NULL)
 	{
-		
+		if(s)
+		{
+			head = s->list;
+			return head; 
+		}
 	}
 	return head;
 }
@@ -52,6 +65,9 @@ int main(int argc, char** argv)
 
 	recordPtr soFileList;/*will be used to keep track of the files for SO list*/
 	recordPtr saFileList; /*will be used to keep track of the files for SA filelist*/
+	recordPtr t;
+	recordPtr temp;
+	int isQ = 0;
 	/*infinite loop that does the constant querying*/
 	while(1)
 	{
@@ -78,12 +94,19 @@ int main(int argc, char** argv)
 			if(strcmp(args[0],q) == 0)
 			{
 				printf("it is q\n");
-				return 1;
+				/*anything u want to do outside of the loop, make a method and call here*/
+				isQ = 1;
+				break;
 			}
 			if((strcmp(args[0],so) == 0) && i > 0)
 			{
 				printf("calls so\n");
 				soFileList = SO(args[i], soFileList);
+				while(t != NULL)
+				{
+					t = soFileList;
+					t = t->next;
+				}
 			}
 			if((strcmp(args[0],sa) == 0) && i > 0)
 			{
@@ -94,6 +117,10 @@ int main(int argc, char** argv)
 			printf("token is %s\n", token);
 			token = strtok(NULL, " ");
 		}/*end of inner while*/
+		if(isQ == 1)
+		{
+			break;
+		}
 		/* test to cheeck what is in the array*/
 		/*for(j=0; j < 10; j++)
 		{
@@ -105,7 +132,7 @@ int main(int argc, char** argv)
 		}*/
 	}
 	/*Testing purposes. Prints hashtable*/
-	/*for(s = words; s != NULL; s = s->hh.next)
+	for(s = words; s != NULL; s = s->hh.next)
 	{
 		printf( "<list> %s\n", s->word);
 		for (temp = s->list; temp != NULL; temp = temp->next){
@@ -119,6 +146,6 @@ int main(int argc, char** argv)
 		}
 		counter = 0;
 		printf("\n</list>\n");
-	}*/
+	}
 	return 1;
 }
