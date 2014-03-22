@@ -27,56 +27,72 @@ int main(int argc, char** argv)
 	recordPtr temp;
 	int counter = 0;
 	char line[BUFFER_LEN];
-	char* token;
-	char* args[10];
-	int i = 0;
+	char** args;
+	char* arg; 
+	size_t i = 0;
 	int j = 0;	
 	int tokenCounter = 0;
 	int len = 0;
+	int count;
+	char* token;
+	char* input;  
+	char* q = (char*)malloc(2 * sizeof(char*));
+	q = "q";
+	char* sa = (char*)malloc(3 * sizeof(char*));
+	sa = "sa";
+	char* so = (char*)malloc(3 * sizeof(char*));
+	so = "so"; 
+	
 	while(1)
 	{
 		fputs("Enter search query\n", stdout);
 		fflush(stdout);
-		fgets(line, BUFFER_LEN, stdin);
-		token = strtok(line, " ");
+		input = fgets(line, BUFFER_LEN, stdin);
+		if(input == NULL)
+		{
+			break;
+		}
+		len = strlen(line);
+		line[len-1] = '\0';
+		printf("input is %s\n", line);
+		args = malloc(count* sizeof(char*));
+		token = strtok(line," ");
+		i = 0;
 		while(token != NULL)
 		{
-			args[i] = token;
+			
+			len = strlen(token) + 1;
+			arg = (char*)malloc(len * sizeof(char));
+			strcpy(arg, token);
+			args[i] = arg;
 			i++;
 			tokenCounter++;
+			printf("token is %s\n", token);
 			token = strtok(NULL, " ");
 		}
-		i = 0;
-		/*prints arguements*/
-		/*for(j = 0; j < tokenCounter; j++)
+		for(j=0; j < 10; j++)/*assuming less than 10 entries*/
 		{
-			printf("args is %s and j is %d\n", args[j], j);
-		}*/
-		len = strlen(args[0]);
-		char dest[len];
-		strncpy(dest, args[0], sizeof args[0]);
-		dest[len-1] = '\0';
-		/*for(j = 0; j < 3; j++)
-		{
-			printf("char in arg[0] is %c\n", dest[j]);
-		}*/
-		if((strcmp(dest, "sa") == 0))
-		{
-			printf("calls sa\n");
-			SA();
-			tokenCounter = 0;
-		}else if(strcmp(dest, "so") == 0){
-			
-			printf("calls so\n");
-			SO();
-			tokenCounter = 0;
-		}else if(strcmp(dest, "q") == 0){
-			break;
-		}else{
-			printf("not valid input\n");
-			tokenCounter = 0;
-			continue;
+			if(args[j] == NULL)
+			{
+				break;
+			}
+			printf("arg[j] is %s\n", args[j]);
 		}
+		if((strcmp(args[0], q) == 0))
+		{
+			printf("it is q\n");
+			return 1;
+		}
+		if((strcmp(args[0],sa)) == 0)
+		{
+			printf("it is sa\n");
+			SA();
+		}
+		if((strcmp(args[0],so)) == 0)
+		{
+			printf("it is so\n");
+			SO();
+		} 
 	}
 	/*Testing purposes. Prints hashtable*/
 	/*for(s = words; s != NULL; s = s->hh.next)
