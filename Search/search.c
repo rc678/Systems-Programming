@@ -13,9 +13,12 @@ void SA()
 }
 
 /*Searches all subsets of the term and prints their file names. "Logical or"*/
-void SO()
+recordPtr SO(char* word)
 {
+	recordPtr head;
+	printf("word in SO is %s\n", word);	
 
+	return head;
 }
 
 int main(int argc, char** argv)
@@ -42,6 +45,9 @@ int main(int argc, char** argv)
 	sa = "sa";
 	char* so = (char*)malloc(3 * sizeof(char*));
 	so = "so"; 
+	int isSO = 0;
+
+	recordPtr fileList;/*will be used to keep track of the files*/
 	
 	while(1)
 	{
@@ -61,10 +67,25 @@ int main(int argc, char** argv)
 		while(token != NULL)
 		{
 			
+			
 			len = strlen(token) + 1;
 			arg = (char*)malloc(len * sizeof(char));
 			strcpy(arg, token);
 			args[i] = arg;
+			if(strcmp(args[0],q) == 0)
+			{
+				printf("it is q\n");
+				return 1;
+			}
+			if(isSO == 1)
+			{
+				printf("is is so\n");
+				fileList = SO(args[i]);
+			}
+			if(((strcmp(args[0],so) == 0) && isSO == 0))
+			{
+				isSO = 1;
+			}
 			i++;
 			tokenCounter++;
 			printf("token is %s\n", token);
@@ -78,21 +99,11 @@ int main(int argc, char** argv)
 			}
 			printf("arg[j] is %s\n", args[j]);
 		}
-		if((strcmp(args[0], q) == 0))
-		{
-			printf("it is q\n");
-			return 1;
-		}
 		if((strcmp(args[0],sa)) == 0)
 		{
 			printf("it is sa\n");
 			SA();
 		}
-		if((strcmp(args[0],so)) == 0)
-		{
-			printf("it is so\n");
-			SO();
-		} 
 	}
 	/*Testing purposes. Prints hashtable*/
 	/*for(s = words; s != NULL; s = s->hh.next)
