@@ -20,26 +20,71 @@ recordPtr SO(char* word, recordPtr fileList)
 	recordPtr head = fileList;
 	struct my_struct* s;
 	struct my_struct* tmp;
-	
+	recordPtr ptr = NULL; 
+	recordPtr temp;
+	recordPtr t;
 	printf("word in SO is %s\n", word);
-	
+
 	HASH_FIND(hh, words, word, strlen(word), s);
 	if(!s){
 		printf("word not in the hashtable\n");
-		return; 
+		return head; 
 	}
 
 	if(head == NULL)
 	{
-		if(s)
-		{
-			head = s->list;
-			return head; 
-		}
+		printf("HEAD IS NULL\n");
+		head = s->list;
+		return head; 
 	}
+	for(temp = s->list; temp != NULL; temp = temp->next)/*checks to see if nodes in hashtable list are in linked list*/
+	{
+		ptr = head;
+		while(ptr != NULL)
+		{
+			if(strcmp(ptr->fileName, temp->fileName) == 0)
+			{
+				break;
+			}
+			ptr = ptr->next;
+		}
+		if(ptr == NULL)/*inserts node to head of list if not in list*/
+		{
+			t = (recordPtr)malloc(sizeof(record));
+			t->fileName = temp->fileName;
+			t->frequency = 1;
+			t->prev = NULL;
+			t->next = head;
+			head->prev = t;
+			head = t;
+		}
+	} 
 	return head;
 }
 
+/*prints the linked list when SO is entered by the user*/
+void printSOList(recordPtr list)
+{
+	recordPtr ptr = list;
+	while(ptr != NULL)
+	{
+		printf("%s\n", ptr->fileName);
+		ptr = ptr->next;
+	}
+}
+
+/*frees the hashtable*/
+void freeHash()
+{
+
+}
+
+/*traverses linked lists and frees them*/
+void freeLists(recordPtr List)
+{
+
+}
+ 
 int main(int argc, char** argv)
 {
 	char* dir = argv[1];
@@ -63,10 +108,10 @@ int main(int argc, char** argv)
 	char* so = (char*)malloc(3 * sizeof(char*));
 	so = "so"; 
 
-	recordPtr soFileList;/*will be used to keep track of the files for SO list*/
-	recordPtr saFileList; /*will be used to keep track of the files for SA filelist*/
-	recordPtr t;
-	recordPtr temp;
+	recordPtr soFileList = NULL;/*will be used to keep track of the files for SO list*/
+	recordPtr saFileList = NULL; /*will be used to keep track of the files for SA filelist*/
+	recordPtr t = NULL;
+	recordPtr temp = NULL;
 	int isQ = 0;
 	/*infinite loop that does the constant querying*/
 	while(1)
@@ -86,7 +131,7 @@ int main(int argc, char** argv)
 		i = 0;
 		while(token != NULL)
 		{
-			
+
 			len = strlen(token) + 1;
 			arg = (char*)malloc(len * sizeof(char));
 			strcpy(arg, token);
@@ -102,11 +147,7 @@ int main(int argc, char** argv)
 			{
 				printf("calls so\n");
 				soFileList = SO(args[i], soFileList);
-				while(t != NULL)
-				{
-					t = soFileList;
-					t = t->next;
-				}
+				t = soFileList;
 			}
 			if((strcmp(args[0],sa) == 0) && i > 0)
 			{
@@ -121,16 +162,21 @@ int main(int argc, char** argv)
 		{
 			break;
 		}
+		if(strcmp(args[0],so) == 0)
+		{
+			printSOList(soFileList);
+		}
 		/* test to cheeck what is in the array*/
 		/*for(j=0; j < 10; j++)
-		{
-			if(args[j] == NULL)
-			{
-				break;
-			}
-			printf("arg[j] is %s\n", args[j]);
-		}*/
-	}
+		  {
+		  if(args[j] == NULL)
+		  {
+		  break;
+		  }
+		  printf("arg[j] is %s\n", args[j]);
+		  }*/
+	}/*end of outer while loop*/
+
 	/*Testing purposes. Prints hashtable*/
 	for(s = words; s != NULL; s = s->hh.next)
 	{
@@ -147,5 +193,8 @@ int main(int argc, char** argv)
 		counter = 0;
 		printf("\n</list>\n");
 	}
+	freeHash();
+	freeLists(soFileList);
+	freeLists(soFileList);
 	return 1;
 }
