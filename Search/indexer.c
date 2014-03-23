@@ -60,6 +60,7 @@ int readFiles(char* dir)
 	/*if the user enters the name of a directory or file that does not exist*/
 	if(stat(dir, &statbuf) == -1)
 	{
+		printf("dir is %s\n", dir);
 		return 0;
 	}
 
@@ -230,20 +231,112 @@ recordPtr resortRecordList(recordPtr head, recordPtr curr)
 }
 
 
-int indexFiles(char* dir)
+int main(int argc, char** argv)
 {
 	/*argv[1] is the inverted-index file name. It gives the name of the file you should create to hold your inverted index*/
 	/*argv[2] gives the name or directory that your program should index*/
 
+	if(argc < 3)
+	{
+		printf("Too few arguments\n");
+		return 0;
+	}
+
+	if(argc > 3)
+	{
+		printf("Too many arguments\n");
+		return 0;
+	}
+
+	struct stat info; 
+	char choice[2];
+	struct my_struct* s;
+	struct my_struct* tmp;
+	recordPtr temp;
+	char* dir = argv[2];
+	FILE* output;
+	int counter = 0;
+	if(dir == NULL)
+	{
+		printf("directory does not exist\n");
+		return 0;
+	}
+	if(stat(dir,&info) != 0)
+	{
+		if(errno == ENOENT)/*file doesn not exist*/
+		{
+			printf("file/directory does not exist\n");
+			return 0;	
+		}
+		if(errno == EACCES)/*we don't have permission to read a file*/
+		{
+			printf("no permission to read the file\n");
+			return 0;
+		}
+	}
 	readFiles(dir);
 	sort_by_name();
+	if(access(argv[1], F_OK) != -1)
+	{
+		fputs("Enter 1 to overwrite file or 0 to quit: ", stdout);
+		fflush(stdout);
+		if(fgets(choice, sizeof choice, stdin))
+		{
+			int num; 
+			if(sscanf(choice, "%d", &num))
+			{
 
+				if(num == 0)/*file exists, but you do not want to overwrite it*/
+				{
+					printf("Enter a new output file\n");
+					return 0;
+				}
+				if(num == 1)/*file exists, but you want to overwrite the file*/
+				{
+					output = fopen(argv[1], "w+");
 
-/*	HASH_ITER(hh, words, s, tmp) {
+					for(s=words; s != NULL; s=s->hh.next) {
+						fprintf(output, "<list> %s\n", s->word);
+						for (temp = s->list; temp != NULL; temp = temp->next){
+							if(counter == 5)
+							{
+								counter = 0;
+								fprintf(output,"\n");
+							}
+							fprintf(output,"%s %d ", temp->fileName, temp->frequency);
+							counter++;
+						}
+						counter = 0;
+						fprintf(output,"\n</list>\n");
+					}
+					return 1;
+				}
+			}
+		}
+	}
+
+	output = fopen(argv[1], "w");
+
+	/*writes to a file if the output file does not already exist*/
+	for(s=words; s != NULL; s=s->hh.next) {
+		fprintf(output, "<list> %s\n", s->word);
+		for (temp = s->list; temp != NULL; temp = temp->next){
+			if(counter == 5)
+			{
+				counter = 0;
+				fprintf(output,"\n");
+			}
+			fprintf(output,"%s %d ", temp->fileName, temp->frequency);
+			counter++;
+		}
+		counter = 0;
+		fprintf(output,"\n</list>\n");
+	}
+
+	HASH_ITER(hh, words, s, tmp) {
 		HASH_DEL(words, s);
 		free(s);
-	}*/
+	}
 	return 1;	
 }/*end of main*/
-
 
