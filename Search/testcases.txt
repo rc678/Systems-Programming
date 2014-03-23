@@ -1,1 +1,85 @@
-We put out own testcases here
+1) Too few arguments
+Input: ./search
+Expected Output: print "Too few arguments" and exit gracefully
+
+2) Too many arguments
+Input: ./search output.txt test.txt
+Expected Output: print "Too many arguments" and exit gracefully
+
+3) empty index file
+Input: ./search output.txt -->output.txt is empty
+Expected Output: print "Index file is empty" and exit gracefully
+
+4) Non-existent index file
+Input: ./search notafile.txt
+Expected Output: print "This index file does not exist" and exit gracefully
+
+-------------------------
+For the remaining testcases, the input is the user search query. Assume we run ./search output.txt
+where output.txt reads:
+
+<list> make
+c.txt 3 a.txt 1
+</list>
+<list> snow
+a.txt 1 d.txt 1
+</list>
+<list> stop
+d.txt 2 b.txt 2 a.txt 1
+</list>
+<list> the
+b.txt 1 d.txt
+</list>
+--------------------------
+
+5) quit
+Input: q
+Expected Output: gracefully shut down search tool
+
+6) so query with one term that is not in the inverted index
+Input: so rain
+Expected Output: Empty
+
+7) so query with one term that is in the inverted index
+Input: so make
+Expected Output: c.txt a.txt
+
+8) so query with two terms, one of which is not in the inverted index file
+Input: so snow rain
+Expected Output: a.txt d.txt
+
+9) so query with two terms that are both in the inverted index but no overlapping text files
+Input: so make the
+Expected Output: c.txt a.txt b.txt d.txt
+
+10) so query with two terms that are both in the inverted index with some overlapping text files
+Input: so the snow
+Expected Output: b.txt d.txt a.txt
+
+11) so query with more than 2 terms that are all in the inverted index with some overlapping text files
+Input: so make snow stop
+Expected Ouptut: c.txt a.txt b.txt d.txt
+
+12) sa query with one term that is not in the inverted index
+Input: sa rain
+Expected Output: Empty
+
+13) sa query with one term that is in the inverted index
+Input: sa make
+Expected Output: c.txt a.txt
+
+14) sa query with two terms, one of which is not in the inverted index file
+Input: sa snow rain
+Expected Output: Empty
+
+15) sa query with two terms that are both in the inverted index but no overlapping text files
+Input: sa make the
+Expected Output: Empty
+
+16) sa query with two terms that are both in the inverted index with some overlapping text files
+Input: sa the snow
+Expected Output: d.txt
+
+17) so query with more than 2 terms that are all in the inverted index with some overlapping text files
+Input: so make snow stop
+Expected Ouptut: a.txt
