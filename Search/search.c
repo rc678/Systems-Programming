@@ -6,6 +6,7 @@
 
 #define BUFFER_LEN 100
 
+void freeLists(recordPtr);
 /*Searches all the terms in the query and prints their file names. "Logical and"*/
 recordPtr SA(char* word, recordPtr List)
 {
@@ -76,13 +77,22 @@ void printSOList(recordPtr list)
 /*frees the hashtable*/
 void freeHash()
 {
-
+	struct my_struct* s;
+	for(s = words; s != NULL; s = s->hh.next)
+	{
+		freeLists(s->list);
+	}
 }
 
 /*traverses linked lists and frees them*/
-void freeLists(recordPtr List)
+void freeLists(recordPtr list)
 {
-
+	recordPtr curr;
+	for(curr = list; curr != NULL;){
+		recordPtr temp = curr;
+		curr = curr->next;
+		free(temp);
+	}
 }
  
 int main(int argc, char** argv)
@@ -101,13 +111,7 @@ int main(int argc, char** argv)
 	int count;
 	char* token;
 	char* input;  
-	char* q = (char*)malloc(2 * sizeof(char*));
-	q = "q";
-	char* sa = (char*)malloc(3 * sizeof(char*));
-	sa = "sa";
-	char* so = (char*)malloc(3 * sizeof(char*));
-	so = "so"; 
-
+	
 	recordPtr soFileList = NULL;/*will be used to keep track of the files for SO list*/
 	recordPtr saFileList = NULL; /*will be used to keep track of the files for SA filelist*/
 	recordPtr t = NULL;
@@ -136,20 +140,20 @@ int main(int argc, char** argv)
 			arg = (char*)malloc(len * sizeof(char));
 			strcpy(arg, token);
 			args[i] = arg;
-			if(strcmp(args[0],q) == 0)
+			if(strcmp(args[0],"q") == 0)
 			{
 				printf("it is q\n");
 				/*anything u want to do outside of the loop, make a method and call here*/
 				isQ = 1;
 				break;
 			}
-			if((strcmp(args[0],so) == 0) && i > 0)
+			if((strcmp(args[0],"so") == 0) && i > 0)
 			{
 				printf("calls so\n");
 				soFileList = SO(args[i], soFileList);
 				t = soFileList;
 			}
-			if((strcmp(args[0],sa) == 0) && i > 0)
+			if((strcmp(args[0],"sa") == 0) && i > 0)
 			{
 				printf("calls sa\n");
 				saFileList = SA(args[i], saFileList);
@@ -162,7 +166,7 @@ int main(int argc, char** argv)
 		{
 			break;
 		}
-		if(strcmp(args[0],so) == 0)
+		if(strcmp(args[0],"so") == 0)
 		{
 			printSOList(soFileList);
 		}
@@ -193,8 +197,11 @@ int main(int argc, char** argv)
 		counter = 0;
 		printf("\n</list>\n");
 	}
+
+	/*space to free memory*/
 	freeHash();
 	freeLists(soFileList);
-	freeLists(soFileList);
+	freeLists(saFileList);
+	free(args);
 	return 1;
 }
