@@ -1,4 +1,3 @@
-#include "indexer.c"
 #include "uthash.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,50 +5,40 @@
 
 #define BUFFER_LEN 100
 
+typedef struct record{
+	char* fileName;
+	int frequency;
+	struct record* next;
+	struct record* prev;
+}record, *recordPtr;
+
+typedef struct tempNode{
+	char* string;
+	int isWord;
+	int frequency;
+	struct tempNode* next; 
+}tempNode, *tempNodePtr;
+
+struct my_struct{
+	const char* word;
+	recordPtr list;
+	UT_hash_handle hh;
+};
+
+/*function protypes*/
 void freeLists(recordPtr);
 
-/*Searches a term in the query and adjusts the output list using "logical and"*/
+struct my_struct* words;
+
+/*Searches all the terms in the query and prints their file names. "Logical and"*/
 recordPtr SA(char* word, recordPtr List)
 {
-        recordPtr head = List;
-        struct my_struct* s;
-        recordPtr ptr;
-        recordPtr temp;
+	recordPtr head = List;	
 
-        HASH_FIND(hh, words, word, strlen(word), s);
-        if(!s){
-                printf("word not in the hashtable\n");
-                return head;
-        }
-
-        if (head == NULL)
-        {
-                head = s->list;
-                for (temp = head; temp != NULL; temp = temp->next)
-                {
-                        temp->frequency = 1;
-                }
-
-                return head;
-        }
-
-        for (temp = s->list; temp != NULL; temp = temp->next)
-        {
-                ptr = head;
-                while (ptr != NULL)
-                {
-                        if (strcmp(ptr->fileName, temp->fileName))
-                        {
-                                ptr->frequency++;
-                        }
-                }
-
-        }
-
-        return head;
+	return head;
 }
 
-/*/*Searches a term in the query and adjusts the output list using "logical or"*/
+/*Searches all subsets of the term and prints their file names. "Logical or"*/
 recordPtr SO(char* word, recordPtr fileList)
 {
 	recordPtr head = fileList;
@@ -97,20 +86,6 @@ recordPtr SO(char* word, recordPtr fileList)
 	return head;
 }
 
-/*prints output for an SA search query*/
-void printSAList(recordPtr list)
-{
-        recordPtr ptr = list;
-        while(ptr != NULL)
-        {
-                if (ptr->frequency == numTerms)
-                {
-                        printf("%s\n", ptr->fileName);
-                }
-                ptr = ptr->next;
-        }
-}
-
 /*prints the linked list when SO is entered by the user*/
 void printSOList(recordPtr list)
 {
@@ -126,9 +101,15 @@ void printSOList(recordPtr list)
 void freeHash()
 {
 	struct my_struct* s;
+	struct my_struct* tmp;
+
 	for(s = words; s != NULL; s = s->hh.next)
 	{
 		freeLists(s->list);
+	}
+	HASH_ITER(hh,words, s, tmp){
+		HASH_DEL(words,s);
+		free(s);
 	}
 }
 
@@ -142,7 +123,116 @@ void freeLists(recordPtr list)
 		free(temp);
 	}
 }
- 
+
+/*adds the temporary linked list to the hashtable*/
+void addToHash(tempNodePtr head)
+{
+	tempNodePtr ptr = head;
+	while(ptr != NULL)
+	{
+		printf("add to hash: %s\n", ptr->string);
+		ptr = ptr->next;
+	}
+}
+
+/*reads the output file from indexer and puts them in the hashtable*/
+void indexFiles(char* dir)
+{
+	printf("dir is %s\n", dir);
+	FILE* outputFile;
+
+	outputFile = fopen(dir,"r");
+
+	if(outputFile == 0)
+	{
+		printf("the file does not exist\n");
+		exit(-1);
+	}
+
+	struct my_struct* s;
+	tempNodePtr head = NULL; 
+	tempNodePtr tail = NULL;
+	tempNodePtr temp = NULL;	
+
+	char* input;
+	char* token;
+	char line[1000]; /*size of line*/
+	int len;
+	int isWord = 0;
+	int freq; 	
+	char* str; 
+
+	while(input = fgets(line, 1000, outputFile))
+	{
+		printf("line is %s\n", line);
+		if(input == NULL)
+		{
+			break;
+		}
+		len = strlen(line);
+		line[len-1] = '\0';
+		token = strtok(line, " ");
+		printf("token before while is %s\n", token);
+		while(token != NULL)
+		{
+			printf("token is %s\n", token);
+			if((token == NULL)|| (strcmp(token, "</list>") == 0))
+			{
+				break;
+			}
+			if(strcmp(token, "<list>") == 0)
+			{
+				printf("reading list\n");
+				isWord = 1;
+				token = strtok(NULL, " ");
+			}
+			if(isWord == 1){
+				isWord = 0;
+				str = malloc(sizeof(strlen(token)));
+				strcpy(str, token);
+				printf("str is %s\n", str);
+				if(head == NULL)
+				{
+					head = (tempNodePtr)malloc(sizeof(tempNode));
+					head->string = str;
+					head->isWord = 1;
+					head->frequency = 0;
+					head->next = NULL;
+					tail = head;
+				}else{
+					temp = (tempNodePtr)malloc(sizeof(tempNode));
+					temp->string = str;
+					temp->isWord = 1;
+					temp->frequency = 0;
+					temp->next = NULL;
+					tail->next = temp;
+					tail = temp;
+				}
+				token = strtok(NULL, " ");
+			}else{
+				str = malloc(sizeof(strlen(token)));
+				strcpy(str, token);
+				temp = (tempNodePtr)malloc(sizeof(tempNode));
+					temp->string = str;
+					temp->isWord = 0;
+					temp->frequency = 0;
+					temp->next = NULL;
+					tail->next = temp;
+					tail = temp;
+			}
+			token = strtok(NULL, " ");
+		}/*end of inner while*/
+
+	}/*end of outer while*/
+	temp = head;
+	while(temp != NULL)
+	{
+		printf("list is: %s\n", temp->string);
+		temp = temp->next;
+	}
+	//addToHash(head);
+}
+
 int main(int argc, char** argv)
 {
 	char* dir = argv[1];
@@ -157,10 +247,9 @@ int main(int argc, char** argv)
 	int j = 0;	
 	int len = 0;
 	int count;
-	int numTerms;
 	char* token;
 	char* input;  
-	
+
 	recordPtr soFileList = NULL;/*will be used to keep track of the files for SO list*/
 	recordPtr saFileList = NULL; /*will be used to keep track of the files for SA filelist*/
 	recordPtr t = NULL;
@@ -204,7 +293,6 @@ int main(int argc, char** argv)
 			}
 			if((strcmp(args[0],"sa") == 0) && i > 0)
 			{
-				numTerms++;
 				printf("calls sa\n");
 				saFileList = SA(args[i], saFileList);
 			}
@@ -219,11 +307,8 @@ int main(int argc, char** argv)
 		if(strcmp(args[0],"so") == 0)
 		{
 			printSOList(soFileList);
+			freeLists(soFileList);
 		}
-		if(strcmp(args[0], "sa") == 0)
-                {
-                        printSAList(saFileList);
-                }
 		/* test to cheeck what is in the array*/
 		/*for(j=0; j < 10; j++)
 		  {
