@@ -127,10 +127,44 @@ void freeLists(recordPtr list)
 /*adds the temporary linked list to the hashtable*/
 void addToHash(tempNodePtr head)
 {
+	if(head == NULL)
+	{
+		printf("file is empty\n");
+		exit(-1);
+	}
 	tempNodePtr ptr = head;
+	recordPtr list;
+	char* str;
+	char* fileName; 
+	int len; 
+	int counter;
+	int fileNum = 0;
 	while(ptr != NULL)
 	{
-		printf("add to hash: %s\n", ptr->string);
+		if(ptr->isWord == 1)/*mallocs string and will put into hashtable after counter is 2*/
+		{
+			counter = 0; 
+			len = strlen(ptr->string);
+			str = malloc(len * sizeof(char));
+			strcpy(str, ptr->string);
+			list = (recordPtr)malloc(sizeof(record));
+			ptr = ptr->next;
+			continue;/*should skip everything*/
+		}
+		if(counter == 1)/*copies the fileName into the node*/
+		{
+			len = strlen(ptr->string);
+			fileName = malloc(len * sizeof(char));
+			strcpy(fileName, ptr->string);
+			list->fileName = fileName;
+		}
+		if(counter == 2)
+		{
+			counter = 1;
+			list = (recordPtr)malloc(sizeof(list));
+			continue;/*should skip everything*/
+		}
+		counter++;
 		ptr = ptr->next;
 	}
 }
@@ -176,17 +210,17 @@ void indexFiles(char* dir)
 		while(token != NULL)
 		{
 			printf("token is %s\n", token);
-			if((token == NULL)|| (strcmp(token, "</list>") == 0))
+			if((token == NULL)|| (strcmp(token, "</list>") == 0))/*goes to next token if null or </*list>*/
 			{
 				break;
 			}
-			if(strcmp(token, "<list>") == 0)
+			if(strcmp(token, "<list>") == 0)/*goes to next token if <list>*/
 			{
 				printf("reading list\n");
 				isWord = 1;
 				token = strtok(NULL, " ");
 			}
-			if(isWord == 1){
+			if(isWord == 1){/*makes nodes for words*/
 				isWord = 0;
 				str = malloc(sizeof(strlen(token)));
 				strcpy(str, token);
@@ -209,16 +243,17 @@ void indexFiles(char* dir)
 					tail = temp;
 				}
 				token = strtok(NULL, " ");
-			}else{
-				str = malloc(sizeof(strlen(token)));
-				strcpy(str, token);
+			}else{/*makes nodes for files and frequency*/
+				int l = strlen(token);/*PROPER WAY TO COPY STRINGS*/
+				str = malloc(len* sizeof(char));
+				strcpy(str,token);
 				temp = (tempNodePtr)malloc(sizeof(tempNode));
-					temp->string = str;
-					temp->isWord = 0;
-					temp->frequency = 0;
-					temp->next = NULL;
-					tail->next = temp;
-					tail = temp;
+				temp->string = str;
+				temp->isWord = 0;
+				temp->frequency = 0;
+				temp->next = NULL;
+				tail->next = temp;
+				tail = temp;
 			}
 			token = strtok(NULL, " ");
 		}/*end of inner while*/
@@ -230,7 +265,7 @@ void indexFiles(char* dir)
 		printf("list is: %s\n", temp->string);
 		temp = temp->next;
 	}
-	//addToHash(head);
+	addToHash(head);
 }
 
 int main(int argc, char** argv)
@@ -246,7 +281,6 @@ int main(int argc, char** argv)
 	int i = 0;
 	int j = 0;	
 	int len = 0;
-	int count;
 	char* token;
 	char* input;  
 
@@ -268,7 +302,7 @@ int main(int argc, char** argv)
 		len = strlen(line);
 		line[len-1] = '\0';
 		printf("input is %s\n", line);
-		args = malloc(count* sizeof(char*));
+		args = malloc(10* sizeof(char*));
 		token = strtok(line," ");
 		i = 0;
 		while(token != NULL)
