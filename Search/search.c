@@ -212,7 +212,7 @@ void indexFiles(char* dir)
 					break;
 				}else{
 					s = (struct my_struct*)malloc(sizeof(struct my_struct));
-					s->word = word;
+					s->word = w;
 					s->list = add;
 					HASH_ADD_KEYPTR(hh, words, w, strlen(w), s);
 				}
