@@ -123,10 +123,35 @@ void freeLists(recordPtr list)
 	
 }
 
-/*adds the temporary linked list to the hashtable*/
-void addToHash(recordPtr head)
-{
 
+recordPtr copyList(recordPtr head)
+{
+	recordPtr p = head;
+	recordPtr newList = NULL;
+	recordPtr tail = NULL;
+	recordPtr temp;
+	while(p != NULL)
+	{
+		if(newList == NULL)
+		{
+			newList = (recordPtr)malloc(sizeof(record));
+			newList->fileName = p->fileName;
+			newList->frequency = p->frequency;
+			newList->next = NULL;
+			newList->prev = NULL;
+			tail = newList;
+		}else{
+			temp = (recordPtr)malloc(sizeof(record));
+			temp->fileName = p->fileName;
+			temp->frequency = p->frequency;
+			temp->next = NULL;
+			temp->prev = tail;
+			tail->next = temp;
+			tail = temp;
+		}
+		p = p->next;
+	}
+	return newList;
 }
 
 /*reads the output file from indexer and puts them in the hashtable*/
@@ -160,6 +185,7 @@ void indexFiles(char* dir)
 	int isWord = 0;
 	int nodeCounter = 0;
 	recordPtr add;
+	recordPtr z; 
 	while(input = fgets(line, 1000, outputFile))
 	{
 		if(input == NULL)
@@ -176,9 +202,10 @@ void indexFiles(char* dir)
 			{
 				printf("word is %s\n", word);
 				/*ADD TO HASH TABLE*/
-				add = (recordPtr)malloc(nodeCounter*sizeof(record));
-				add = head;
-				HASH_FIND(hh, words, token, strlen(token), s);
+				add = copyList(head);
+				char* w = malloc(sizeof(word));
+				w = strcpy(w, word);
+				HASH_FIND(hh, words, w, strlen(w), s);
 				if(s)
 				{
 					printf("in the hashtable already\n");
@@ -187,9 +214,10 @@ void indexFiles(char* dir)
 					s = (struct my_struct*)malloc(sizeof(struct my_struct));
 					s->word = word;
 					s->list = add;
-					HASH_ADD_KEYPTR(hh, words, token, strlen(token), s);
+					HASH_ADD_KEYPTR(hh, words, w, strlen(w), s);
 				}
 				freeLists(head);
+				free(word);
 				head = NULL;
 				nodeCounter = 0;
 				counter = -1;
@@ -207,6 +235,7 @@ void indexFiles(char* dir)
 					head->prev = NULL;
 					tail = head;
 					nodeCounter = 1;
+					
 				}else{
 					temp = (recordPtr)malloc(sizeof(record));
 					temp->fileName = file;
@@ -244,7 +273,6 @@ void indexFiles(char* dir)
 		}/*end of inner while*/
 
 	}/*end of outer while*/
-	addToHash(head);
 }
 
 int main(int argc, char** argv)
