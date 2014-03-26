@@ -325,6 +325,18 @@ void indexFiles(char* dir)
 
 int main(int argc, char** argv)
 {
+	if(argc < 2)
+        {   
+                printf("Too few arguments\n");
+                return 0;
+        }   
+
+        if(argc > 2)
+        {   
+                printf("Too many arguments\n");
+                return 0;
+        }  
+	
 	char* dir = argv[1];
 	indexFiles(dir);/*successfull indexes files and puts them into the hashtable words*/
 	struct my_struct* s;
