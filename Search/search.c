@@ -228,7 +228,7 @@ void indexFiles(char* dir)
 	int freq; 	
 	char* file;
 	char* word; 
-	int counter = NULL;
+	int counter = 0;
 	int listComplete = 0;
 	int isWord = 0;
 	int nodeCounter = 0;
@@ -347,7 +347,7 @@ int main(int argc, char** argv)
 	char* arg; 
 	int i = 0;
 	int j = 0;	
-	int len = 0
+	int len = 0;
 	int numTerms = 0;
 	char* token;
 	char* input;  
