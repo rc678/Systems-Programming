@@ -234,8 +234,11 @@ void indexFiles(char* dir)
 	int nodeCounter = 0;
 	recordPtr add;
 	recordPtr z; 
+	int fileIsEmpty = 1;
+	
 	while(input = fgets(line, 1000, outputFile))
 	{
+		fileIsEmpty = 0;
 		if(input == NULL)
 		{
 			break;
@@ -321,6 +324,11 @@ void indexFiles(char* dir)
 		}/*end of inner while*/
 
 	}/*end of outer while*/
+	
+	if (fileIsEmpty == 1){ 
+                printf("Input file is empty\n");
+                exit(-1);
+        }   
 }
 
 int main(int argc, char** argv)
