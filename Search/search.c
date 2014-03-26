@@ -20,6 +20,7 @@ struct my_struct{
 
 /*function protypes*/
 void freeLists(recordPtr);
+recordPtr copyList(recordPtr);
 
 struct my_struct* words;
 
@@ -85,7 +86,8 @@ recordPtr SO(char* word, recordPtr fileList)
 	if(head == NULL)
 	{
 		printf("HEAD IS NULL\n");
-		head = s->list;
+		temp = s->list;
+		head = copyList(temp);
 		return head; 
 	}
 	for(temp = s->list; temp != NULL; temp = temp->next)/*checks to see if nodes in hashtable list are in linked list*/
@@ -205,7 +207,6 @@ recordPtr copyList(recordPtr head)
 /*reads the output file from indexer and puts them in the hashtable*/
 void indexFiles(char* dir)
 {
-	printf("dir is %s\n", dir);
 	FILE* outputFile;
 
 	outputFile = fopen(dir,"r");
@@ -251,7 +252,6 @@ void indexFiles(char* dir)
 		{
 			if(strcmp(token, "</list>") == 0)/*insert into hashtable*/
 			{
-				printf("word is %s\n", word);
 				/*ADD TO HASH TABLE*/
 				add = copyList(head);
 				char* w = malloc(sizeof(word));
@@ -275,7 +275,6 @@ void indexFiles(char* dir)
 			}
 			if((counter%2 == 0) && (counter != 0) && (counter > 0))/*even but not zero. copy frequency*/
 			{
-				printf("token in even is %s\n", token);
 				freq = atoi(token);
 				if(head == NULL)
 				{
@@ -302,14 +301,12 @@ void indexFiles(char* dir)
 				/*figure out way to skip next if or get next token*/
 			}
 			if((counter%2 == 1) && (counter > 0) && (freq != -1)){/*odd so strcpy file*/
-				printf("token in odd is %s\n", token);
 				len = strlen(token);
 				file = malloc(len *sizeof(char));
 				strcpy(file, token);
 				counter++;
 			}	
 			if(counter == 0 && (strcmp(token, "<list>") != 0)){/*strcpy word*/
-				printf("token in 0 is %s\n", token);
 				len = strlen(token);
 				word = malloc(len * sizeof(char));
 				strcpy(word, token);
@@ -419,6 +416,7 @@ int main(int argc, char** argv)
 		{
 			printSOList(soFileList);
 			freeLists(soFileList);
+			soFileList = NULL;
 		}
 		if(strcmp(args[0], "sa") == 0)
                 {
