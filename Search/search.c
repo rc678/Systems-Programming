@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 
 #define BUFFER_LEN 100
 
@@ -27,25 +28,27 @@ struct my_struct* words;
 /*Searches a term in the query and adjusts the output list using "logical and"*/
 recordPtr SA(char* word, recordPtr List)
 {
-        recordPtr head = List;  
+	recordPtr head = List;  
         struct my_struct* s;
         recordPtr ptr = NULL; 
         recordPtr temp;
+	recordPtr t;	
 
         HASH_FIND(hh, words, word, strlen(word), s); 
         if(!s){
-                printf("word not in the hashtable\n");
                 return head; 
         }   
 
-        if (head == NULL)
+        if (List == NULL)
         {   
-                head = s->list;
-                for (temp = head; temp != NULL; temp = temp->next)
+                head = copyList(s->list);
+		temp = head;
+                while (temp != NULL)
                 {   
                         temp->frequency = 1;
+			temp = temp->next;
                 }   
-    
+   		
                 return head;
         }   
 
@@ -53,16 +56,17 @@ recordPtr SA(char* word, recordPtr List)
         {    
                 ptr = head;
                 while (ptr != NULL)
-                {   
-                        if (strcmp(ptr->fileName, temp->fileName))
+                {  
+                        if (strcmp(ptr->fileName, temp->fileName) == 0)
                         {   
                                 ptr->frequency++;
-                        }   
+                        }
+			ptr = ptr->next;   
                 }   
-    
-        }   
-    
-        return head;
+   	 
+	}   
+
+	return head;
 }
 
 
@@ -75,17 +79,14 @@ recordPtr SO(char* word, recordPtr fileList)
 	recordPtr ptr = NULL; 
 	recordPtr temp;
 	recordPtr t;
-	printf("word in SO is %s\n", word);
 
 	HASH_FIND(hh, words, word, strlen(word), s);
 	if(!s){
-		printf("word not in the hashtable\n");
 		return head; 
 	}
 
 	if(head == NULL)
 	{
-		printf("HEAD IS NULL\n");
 		temp = s->list;
 		head = copyList(temp);
 		return head; 
@@ -118,15 +119,16 @@ recordPtr SO(char* word, recordPtr fileList)
 /*prints output for an SA search query*/
 void printSAList(recordPtr list, int numTerms)
 {
-        recordPtr ptr = list;
-        while(ptr != NULL)
-        {
-                if (ptr->frequency == numTerms)
-                {
-                        printf("%s\n", ptr->fileName);
-                }
-                ptr = ptr->next;
-        }
+	recordPtr ptr = list;
+	while(ptr != NULL)
+	{
+		if (ptr->frequency == numTerms)
+		{
+			printf("%s ", ptr->fileName);
+		}
+		ptr = ptr->next;
+	}
+	printf("\n");
 }
 
 /*prints the linked list when SO is entered by the user*/
@@ -135,9 +137,10 @@ void printSOList(recordPtr list)
 	recordPtr ptr = list;
 	while(ptr != NULL)
 	{
-		printf("%s\n", ptr->fileName);
+		printf("%s ", ptr->fileName);
 		ptr = ptr->next;
 	}
+	printf("\n");
 }
 
 /*frees the hashtable*/
@@ -170,7 +173,7 @@ void freeLists(recordPtr list)
 		next = p->next;
 		free(p);
 	}
-	
+
 }
 
 
@@ -236,7 +239,7 @@ void indexFiles(char* dir)
 	recordPtr add;
 	recordPtr z; 
 	int fileIsEmpty = 1;
-	
+
 	while(input = fgets(line, 1000, outputFile))
 	{
 		fileIsEmpty = 0;
@@ -247,7 +250,7 @@ void indexFiles(char* dir)
 		len = strlen(line);
 		line[len-1] = '\0';
 		token = strtok(line, " ");
-		/*printf("token before while is %s\n", token);*/
+		
 		while(token != NULL)
 		{
 			if(strcmp(token, "</list>") == 0)/*insert into hashtable*/
@@ -259,7 +262,6 @@ void indexFiles(char* dir)
 				HASH_FIND(hh, words, w, strlen(w), s);
 				if(s)
 				{
-					printf("in the hashtable already\n");
 					break;
 				}else{
 					s = (struct my_struct*)malloc(sizeof(struct my_struct));
@@ -285,7 +287,7 @@ void indexFiles(char* dir)
 					head->prev = NULL;
 					tail = head;
 					nodeCounter = 1;
-					
+
 				}else{
 					temp = (recordPtr)malloc(sizeof(record));
 					temp->fileName = file;
@@ -321,27 +323,27 @@ void indexFiles(char* dir)
 		}/*end of inner while*/
 
 	}/*end of outer while*/
-	
+
 	if (fileIsEmpty == 1){ 
-                printf("Input file is empty\n");
-                exit(-1);
-        }   
+		printf("Input file is empty\n");
+		exit(-1);
+	}   
 }
 
 int main(int argc, char** argv)
 {
 	if(argc < 2)
-        {   
-                printf("Too few arguments\n");
-                return 0;
-        }   
+	{   
+		printf("Too few arguments\n");
+		return 0;
+	}   
 
-        if(argc > 2)
-        {   
-                printf("Too many arguments\n");
-                return 0;
-        }  
-	
+	if(argc > 2)
+	{   
+		printf("Too many arguments\n");
+		return 0;
+	}  
+
 	char* dir = argv[1];
 	indexFiles(dir);/*successfull indexes files and puts them into the hashtable words*/
 	struct my_struct* s;
@@ -374,7 +376,6 @@ int main(int argc, char** argv)
 		}
 		len = strlen(line);
 		line[len-1] = '\0';
-		printf("input is %s\n", line);
 		args = malloc(10* sizeof(char*));
 		token = strtok(line," ");
 		i = 0;
@@ -387,25 +388,21 @@ int main(int argc, char** argv)
 			args[i] = arg;
 			if(strcmp(args[0],"q") == 0)
 			{
-				printf("it is q\n");
 				/*anything u want to do outside of the loop, make a method and call here*/
 				isQ = 1;
 				break;
 			}
 			if((strcmp(args[0],"so") == 0) && i > 0)
 			{
-				printf("calls so\n");
 				soFileList = SO(args[i], soFileList);
 				t = soFileList;
 			}
 			if((strcmp(args[0],"sa") == 0) && i > 0)
 			{
 				numTerms++;
-				printf("calls sa\n");
 				saFileList = SA(args[i], saFileList);
 			}
 			i++;
-			printf("token is %s\n", token);
 			token = strtok(NULL, " ");
 		}/*end of inner while*/
 		if(isQ == 1)
@@ -419,36 +416,13 @@ int main(int argc, char** argv)
 			soFileList = NULL;
 		}
 		if(strcmp(args[0], "sa") == 0)
-                {
-                        printSAList(saFileList, numTerms);
-                }
-		/* test to cheeck what is in the array*/
-		/*for(j=0; j < 10; j++)
-		  {
-		  if(args[j] == NULL)
-		  {
-		  break;
-		  }
-		  printf("arg[j] is %s\n", args[j]);
-		  }*/
-	}/*end of outer while loop*/
-
-	/*Testing purposes. Prints hashtable*/
-	for(s = words; s != NULL; s = s->hh.next)
-	{
-		printf( "<list> %s\n", s->word);
-		for (temp = s->list; temp != NULL; temp = temp->next){
-			if(counter == 5)
-			{
-				counter = 0;
-				printf("\n");
-			}
-			printf("%s %d ", temp->fileName, temp->frequency);
-			counter++;
+		{
+			printSAList(saFileList, numTerms);
+			freeLists(saFileList);
+			saFileList = NULL;
+			numTerms = 0;
 		}
-		counter = 0;
-		printf("\n</list>\n");
-	}
+	}/*end of outer while loop*/
 
 	/*space to free memory*/
 	freeHash();
