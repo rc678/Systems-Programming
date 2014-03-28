@@ -1,0 +1,3 @@
+We used an external macros called uthash to generate the data structure that stores the words and their filenames. Our overall implementation involves generating an index file from indexer.c and then using that index file in search.c to query different words. First, we parse the inverted-index file and place the words in a hashtable, as the keys. The values of each key is a linked list of the filenames and their frequencies. After generating the hashtable we have an infite while loop for constant querying. If the user enters sa or so, a function pertaining to one of those inputs is called.
+
+The indexFiles function parses the inverted index file and generates a hash table data structure to hold the words and their file names. 
