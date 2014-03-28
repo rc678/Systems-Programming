@@ -136,6 +136,7 @@ void printSAList(recordPtr list, int numTerms)
 		}
 		ptr = ptr->next;
 	}
+	printf("\n");
 }
 
 /*prints list of file names for a SO query*/
@@ -147,6 +148,7 @@ void printSOList(recordPtr list)
 		printf("%s ", ptr->fileName);
 		ptr = ptr->next;
 	}
+	printf("\n");
 }
 
 /*frees the hashtable*/
