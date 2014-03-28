@@ -19,7 +19,7 @@ struct my_struct{
 	UT_hash_handle hh;
 };
 
-/*function protypes*/
+/*function prototypes*/
 void freeLists(recordPtr);
 recordPtr copyList(recordPtr);
 
@@ -28,21 +28,24 @@ struct my_struct* words;
 /*Searches a term in the query and adjusts the output list using "logical and"*/
 recordPtr SA(char* word, recordPtr List)
 {
-	recordPtr head = List;  
-        struct my_struct* s;
-        recordPtr ptr = NULL; 
-        recordPtr temp;
-	recordPtr t;	
+	recordPtr head = List; /*pointer to list that will be adjusted*/
+        struct my_struct* s; /*pointer to hash table*/
+        recordPtr ptr = NULL; /*pointer for list traversak*/
+        recordPtr temp; /*pointer for list in hash table*/
 
+	/*Do nothing if word is not in hash table*/
         HASH_FIND(hh, words, word, strlen(word), s); 
         if(!s){
                 return head; 
         }   
 
+	/*Set the list to the list in the hash table for the word if this is the first term that is actually found*/
         if (List == NULL)
         {   
-                head = copyList(s->list);
+                head = copyList(s->list); /*copy the list so the hash table list isnt altered*/
 		temp = head;
+		
+		/*Set the frequency to 1 for each record in the list*/
                 while (temp != NULL)
                 {   
                         temp->frequency = 1;
@@ -52,6 +55,8 @@ recordPtr SA(char* word, recordPtr List)
                 return head;
         }   
 
+	/*If the list has already been initialized, traverse it and increment the frequency for any record whose
+	file name is also in the list for the word in the hash table*/
         for (temp = s->list; temp != NULL; temp = temp->next)
         {    
                 ptr = head;
@@ -91,7 +96,9 @@ recordPtr SO(char* word, recordPtr fileList)
 		head = copyList(temp);
 		return head; 
 	}
-	for(temp = s->list; temp != NULL; temp = temp->next)/*checks to see if nodes in hashtable list are in linked list*/
+	/*traverses word's list in hashtable and adds any records to the output list whose file name
+	is not already in it*/
+	for(temp = s->list; temp != NULL; temp = temp->next)
 	{
 		ptr = head;
 		while(ptr != NULL)
@@ -116,22 +123,22 @@ recordPtr SO(char* word, recordPtr fileList)
 	return head;
 }
 
-/*prints output for an SA search query*/
+/*prints list of file names for an SA search query*/
 void printSAList(recordPtr list, int numTerms)
 {
 	recordPtr ptr = list;
 	while(ptr != NULL)
 	{
+		/*only print the file names that have occurred for each word in the query*/
 		if (ptr->frequency == numTerms)
 		{
 			printf("%s ", ptr->fileName);
 		}
 		ptr = ptr->next;
 	}
-	printf("\n");
 }
 
-/*prints the linked list when SO is entered by the user*/
+/*prints list of file names for a SO query*/
 void printSOList(recordPtr list)
 {
 	recordPtr ptr = list;
@@ -140,7 +147,6 @@ void printSOList(recordPtr list)
 		printf("%s ", ptr->fileName);
 		ptr = ptr->next;
 	}
-	printf("\n");
 }
 
 /*frees the hashtable*/
@@ -176,7 +182,7 @@ void freeLists(recordPtr list)
 
 }
 
-
+/*copies a list of record pointers to a new list*/
 recordPtr copyList(recordPtr head)
 {
 	recordPtr p = head;
@@ -207,7 +213,7 @@ recordPtr copyList(recordPtr head)
 	return newList;
 }
 
-/*reads the output file from indexer and puts them in the hashtable*/
+/*reads an inverted index file in the format of the output file from indexer and puts the data in a hashtable*/
 void indexFiles(char* dir)
 {
 	FILE* outputFile;
@@ -355,16 +361,17 @@ int main(int argc, char** argv)
 	int i = 0;
 	int j = 0;	
 	int len = 0;
-	int numTerms = 0;
-	char* token;
-	char* input;  
+	int numTerms = 0;	/*number of terms in current search query*/
+	char* token;	/*single token of input line*/
+	char* input;	/*input query from user*/
 
 	recordPtr soFileList = NULL;/*will be used to keep track of the files for SO list*/
 	recordPtr saFileList = NULL; /*will be used to keep track of the files for SA filelist*/
 	recordPtr t = NULL;
 	recordPtr temp = NULL;
 	int isQ = 0;
-	/*infinite loop that does the constant querying*/
+	
+	/*infinite loop that does the constant querying until user asks to quit*/
 	while(1)
 	{
 		fputs("Enter search query\n", stdout);
