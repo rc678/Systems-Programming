@@ -157,10 +157,12 @@ void freeHash()
 	struct my_struct* s;
 	struct my_struct* tmp;
 
+	/*frees the values in the hashtable*/
 	for(s = words; s != NULL; s = s->hh.next)
 	{
 		freeLists(s->list);
 	}
+	/*frees the keys in the hashtable*/
 	HASH_ITER(hh,words, s, tmp){
 		HASH_DEL(words,s);
 		free(s);
@@ -241,11 +243,8 @@ void indexFiles(char* dir)
 	char* file;
 	char* word; 
 	int counter = 0;
-	int listComplete = 0;
 	int isWord = 0;
-	int nodeCounter = 0;
 	recordPtr add;
-	recordPtr z; 
 	int fileIsEmpty = 1;
 
 	while(input = fgets(line, 1000, outputFile))
@@ -263,7 +262,6 @@ void indexFiles(char* dir)
 		{
 			if(strcmp(token, "</list>") == 0)/*insert into hashtable*/
 			{
-				/*ADD TO HASH TABLE*/
 				add = copyList(head);
 				char* w = malloc(sizeof(word));
 				w = strcpy(w, word);
@@ -280,7 +278,6 @@ void indexFiles(char* dir)
 				freeLists(head);
 				free(word);
 				head = NULL;
-				nodeCounter = 0;
 				counter = -1;
 			}
 			if((counter%2 == 0) && (counter != 0) && (counter > 0))/*even but not zero. copy frequency*/
@@ -294,7 +291,6 @@ void indexFiles(char* dir)
 					head->next = NULL;
 					head->prev = NULL;
 					tail = head;
-					nodeCounter = 1;
 
 				}else{
 					temp = (recordPtr)malloc(sizeof(record));
@@ -304,25 +300,23 @@ void indexFiles(char* dir)
 					temp->prev = tail;
 					tail->next = temp;
 					tail = temp;
-					nodeCounter++;
 				}
 				counter++;
 				freq = -1;
-				/*figure out way to skip next if or get next token*/
 			}
-			if((counter%2 == 1) && (counter > 0) && (freq != -1)){/*odd so strcpy file*/
+			if((counter%2 == 1) && (counter > 0) && (freq != -1)){/*odd number. strcpy fileName*/
 				len = strlen(token);
 				file = malloc(len *sizeof(char));
 				strcpy(file, token);
 				counter++;
 			}	
-			if(counter == 0 && (strcmp(token, "<list>") != 0)){/*strcpy word*/
+			if(counter == 0 && (strcmp(token, "<list>") != 0)){/*strcpy word as key for hashtable*/
 				len = strlen(token);
 				word = malloc(len * sizeof(char));
 				strcpy(word, token);
 				counter++;
 			}
-			if((strcmp(token, "<list>") == 0))/*goes to next token if <list>*/
+			if((strcmp(token, "<list>") == 0))/*starts the counter for each new word*/
 			{
 				counter = 0;	
 			}
@@ -336,6 +330,8 @@ void indexFiles(char* dir)
 		printf("Input file is empty\n");
 		exit(-1);
 	}   
+	fclose(outputFile);
+	freeLists(head);
 }
 
 int main(int argc, char** argv)
@@ -353,7 +349,7 @@ int main(int argc, char** argv)
 	}  
 
 	char* dir = argv[1];
-	indexFiles(dir);/*successfull indexes files and puts them into the hashtable words*/
+	indexFiles(dir);/*successfully indexes files and puts them into the hashtable words*/
 	struct my_struct* s;
 	struct my_struct* tmp;
 	int counter = 0;
@@ -369,7 +365,6 @@ int main(int argc, char** argv)
 
 	recordPtr soFileList = NULL;/*will be used to keep track of the files for SO list*/
 	recordPtr saFileList = NULL; /*will be used to keep track of the files for SA filelist*/
-	recordPtr t = NULL;
 	recordPtr temp = NULL;
 	int isQ = 0;
 	
@@ -404,7 +399,6 @@ int main(int argc, char** argv)
 			if((strcmp(args[0],"so") == 0) && i > 0)
 			{
 				soFileList = SO(args[i], soFileList);
-				t = soFileList;
 			}
 			if((strcmp(args[0],"sa") == 0) && i > 0)
 			{
@@ -417,6 +411,10 @@ int main(int argc, char** argv)
 		if(isQ == 1)
 		{
 			break;
+		}
+		if(soFileList == NULL || saFileList == NULL)
+		{
+			printf("input is not valid\n");
 		}
 		if(strcmp(args[0],"so") == 0)
 		{
@@ -434,9 +432,8 @@ int main(int argc, char** argv)
 	}/*end of outer while loop*/
 
 	/*space to free memory*/
-	freeHash();
 	freeLists(soFileList);
 	freeLists(saFileList);
-	free(args);
+	freeHash();
 	return 1;
 }
