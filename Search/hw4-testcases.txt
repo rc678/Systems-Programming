@@ -86,4 +86,4 @@ Expected Ouptut: a.txt
 
 18) empty query
 Input:
-Expected Output: print "input is not valid" and ask for new search query
+Expected Output: print nothing and ask for new search query
