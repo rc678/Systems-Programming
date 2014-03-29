@@ -413,7 +413,7 @@ int main(int argc, char** argv)
 		}
 		if(soFileList == NULL && saFileList == NULL)
 		{
-			printf("invalid command or word not in files");
+			printf("invalid command or word not in files\n");
 		}
 		if(strcmp(args[0],"so") == 0)
 		{
