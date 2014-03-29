@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
 
 #define BUFFER_LEN 100
 
@@ -412,10 +411,7 @@ int main(int argc, char** argv)
 		{
 			break;
 		}
-		if(soFileList == NULL || saFileList == NULL)
-		{
-			printf("input is not valid\n");
-		}
+
 		if(strcmp(args[0],"so") == 0)
 		{
 			printSOList(soFileList);
