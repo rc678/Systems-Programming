@@ -83,3 +83,7 @@ Expected Output: d.txt
 17) sa query with more than 2 terms that are all in the inverted index with some overlapping text files
 Input: sa make snow stop
 Expected Ouptut: a.txt
+
+18) empty query
+Input:
+Expected Output: print "input is not valid" and ask for new search query
