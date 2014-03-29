@@ -382,6 +382,9 @@ int main(int argc, char** argv)
 		args = malloc(10* sizeof(char*));
 		token = strtok(line," ");
 		i = 0;
+		if (token == NULL){
+			continue;
+		}
 		while(token != NULL)
 		{
 
@@ -410,10 +413,6 @@ int main(int argc, char** argv)
 		if(isQ == 1)
 		{
 			break;
-		}
-		if(soFileList == NULL && saFileList == NULL)
-		{
-			printf("invalid command or word not in files\n");
 		}
 		if(strcmp(args[0],"so") == 0)
 		{
