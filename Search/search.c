@@ -411,7 +411,10 @@ int main(int argc, char** argv)
 		{
 			break;
 		}
-
+		if(soFileList == NULL && saFileList == NULL)
+		{
+			printf("invalid command or word not in files");
+		}
 		if(strcmp(args[0],"so") == 0)
 		{
 			printSOList(soFileList);
