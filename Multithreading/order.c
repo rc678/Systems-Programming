@@ -1,1 +1,5 @@
-/*this will contain the main method */
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#include <string.h>
+
