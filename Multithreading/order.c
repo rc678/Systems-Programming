@@ -7,7 +7,33 @@ typedef struct qNode{
 	char* bookTitle;
 	int customerID;
 	char* category;
+	struct qNode *next;
 }qNode, *qNodePtr;
+
+typedef struct Queue{
+	qNodePtr head;
+	qNodePtr tail;
+}Queue, QueuePtr;
+
+qNodePtr enqueue(Queue q, qNodePtr newNode)
+{
+	if (q->head == NULL){
+		q->head = newNode;
+		q->tail = newNode;
+		return q->head;
+	}
+	
+	q->tail->next = newNode;
+	q->tail = newNode;
+	return q->head;
+}
+
+qNodePtr dequeue(Queue q)
+{
+	qNodePtr temp = q->head;
+	q->head = q->head->next;
+	return temp;
+}
 
 /*makes a data structure based on the database.txt*/
 void createDatabase(char* database){
