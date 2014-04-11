@@ -44,14 +44,20 @@ void createDatabase(char* database){
 	char* input;
 	int lineNum = 0;
 
-	if(dbase == 0)
+	if(dbase == NULL)
 	{
-		printf("database is empty\n");
+		printf("database file does not exist\n");
 		exit(-1);
 	}
 
 	int c;
-
+	
+	if (fgetc(dbase) == EOF){
+		printf("database file is empty\n");
+		exit(-1);
+	}
+	rewind(dbase);
+	
 	/*counts the number of lines in the database.txt*/
 	do{
 		c = fgetc(dbase);
@@ -59,8 +65,8 @@ void createDatabase(char* database){
 		{
 			lineNum++;
 		}
-	}while(c != EOF);	
-
+	}while(c != EOF);
+	
 	printf("%d\n", lineNum); 	
 	
 	qNode db[lineNum];
