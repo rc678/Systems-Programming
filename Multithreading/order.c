@@ -67,7 +67,7 @@ void createQueues(char* categories)
 	char* line;
 	char category[100];
 	int len;
-	struct my_struct *s;
+	struct my_struct* s;
 
 	if (cg == NULL){
 		printf("category file does not exist\n");
@@ -85,16 +85,23 @@ void createQueues(char* categories)
 		if (line == NULL){
 			return;
 		}
-		
+
 		len = strlen(line);
-                line[len-1] = '\0';
-		char* c = malloc(sizeof(char));
-		strcpy(c, line);
-		s = (struct my_struct*)malloc(sizeof(struct my_struct));
-		s->category = c;
-		QueuePtr temp = (QueuePtr)malloc(sizeof(Queue));
-		s->q = temp;
-		HASH_ADD_KEYPTR(hh, categories, c, strlen(c), s);
+		line[len-1] = '\0';
+		char* c = malloc(len * sizeof(char));
+		c = strcpy(c, line);
+		HASH_FIND(hh, cat, c, strlen(c), s);
+		if(s)
+		{
+			break;
+		}else{
+			s = (struct my_struct*)malloc(sizeof(struct my_struct));
+			s->category = c;
+			QueuePtr temp = (QueuePtr)malloc(sizeof(Queue));
+			s->q = temp;
+			printf("c is %s\n", c);
+			HASH_ADD_KEYPTR(hh, cat, c, strlen(c), s);
+		}
 	}
 
 	fclose(cg);
