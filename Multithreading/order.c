@@ -23,6 +23,14 @@ struct my_struct{
         UT_hash_handle hh; 
 };
 
+typedef struct custInfo{
+	char* name;
+	double creditLimit;
+	char* address;
+	char* state;
+	char* zip; 
+}custInfo, *iPtr; 
+
 struct my_struct* categories;
 
 qNodePtr enqueue(QueuePtr q, qNodePtr newNode)
@@ -126,11 +134,17 @@ void createDatabase(char* database){
 
 	printf("%d\n", lineNum); 	
 
-	qNode db[lineNum];
+	iPtr* db = malloc(lineNum * sizeof(custInfo));
 
 	rewind(dbase);
 	char* in;
 	char line[1000];	
+	char* token;
+	int counter = 0;
+	int len;
+	int index = 0;
+	iPtr temp = NULL;
+	double credit = 0.0;
 
 	while(in = fgets(line, 1000, dbase))
 	{
@@ -139,9 +153,61 @@ void createDatabase(char* database){
 		{
 			break;
 		}
-
-		printf("%s\n", in);
-	}	
+		
+		len = strlen(line);
+		line[len-1] = '\0';
+		token = strtok(line, "|");
+		
+		while(token != NULL)
+		{
+			printf("token is %s\n", token);
+			if(counter == 0)
+			{	
+				len = strlen(token);
+				temp = (iPtr) malloc(sizeof(custInfo));
+				char* name = malloc(len *sizeof(char));
+				strcpy(name, token);
+				temp->name = name;
+						
+			}
+			if(counter == 2)
+			{
+				credit = atoi(token);
+				temp->creditLimit = credit;
+			}
+			if(counter == 3)
+			{
+				len = strlen(token);
+				char* street = malloc(len * sizeof(char));
+				strcpy(street, token);
+				temp->address = street;
+			}
+			if(counter == 4)
+			{
+				len = strlen(token);
+				char* state = malloc(len * sizeof(char));
+				strcpy(state, token);
+				temp->state = state;
+			}
+			if(counter == 5)
+			{
+				len = strlen(token);
+				char* zip = malloc(len * sizeof(char));
+				strcpy(zip, token);
+				temp->zip = zip;
+				db[index] = temp;
+				index++; 
+				counter = -1;
+			}
+			counter++;
+			token = strtok(NULL, "|");		
+		}/*end of inner while*/	
+	}/*end of outer while*/
+	int i;
+	for(i = 0; i < lineNum;i++)
+	{
+		printf("in array%s\n", db[i]->name);
+	} 	
 
 }
 
