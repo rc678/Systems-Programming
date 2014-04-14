@@ -18,9 +18,9 @@ typedef struct Queue{
 }Queue, *QueuePtr;
 
 struct my_struct{
-        const char* category;
-        QueuePtr q;
-        UT_hash_handle hh; 
+	const char* category;
+	QueuePtr q;
+	UT_hash_handle hh; 
 };
 
 typedef struct custInfo{
@@ -31,7 +31,9 @@ typedef struct custInfo{
 	char* zip; 
 }custInfo, *iPtr; 
 
-struct my_struct* categories;
+void createQueues(char*);
+struct my_struct* cat;
+
 
 qNodePtr enqueue(QueuePtr q, qNodePtr newNode)
 {
@@ -41,7 +43,7 @@ qNodePtr enqueue(QueuePtr q, qNodePtr newNode)
 		q->numOrders++;
 		return q->head;
 	}
-	
+
 	q->tail->next = newNode;
 	q->tail = newNode;
 	q->numOrders++;
@@ -89,7 +91,7 @@ void createQueues(char* categories)
 		len = strlen(line);
 		line[len-1] = '\0';
 		char* c = malloc(len * sizeof(char));
-		c = strcpy(c, line);
+		strcpy(c, line);
 		HASH_FIND(hh, cat, c, strlen(c), s);
 		if(s)
 		{
@@ -160,11 +162,11 @@ void createDatabase(char* database){
 		{
 			break;
 		}
-		
+
 		len = strlen(line);
 		line[len-1] = '\0';
 		token = strtok(line, "|");
-		
+
 		while(token != NULL)
 		{
 			printf("token is %s\n", token);
@@ -175,7 +177,7 @@ void createDatabase(char* database){
 				char* name = malloc(len *sizeof(char));
 				strcpy(name, token);
 				temp->name = name;
-						
+
 			}
 			if(counter == 2)
 			{
@@ -241,8 +243,8 @@ int main(int argc, char** argv)
 		printf("argument is null\n");
 		return 0;
 	}
-	createDatabase(database);	
+	/*createDatabase(database);*/
+	createQueues(categories);	
 
 	return 0;
 }
-
