@@ -61,15 +61,15 @@ QueuePtr enqueue(QueuePtr q, qNodePtr newNode)
 	return q;
 }
 
-QueuePtr dequeue(QueuePtr q)
+qNodePtr dequeue(QueuePtr q)
 {
 	if (q->head == NULL){
-		return q;
+		return temp;
 	}
 	qNodePtr temp = q->head;
 	q->head = q->head->next;
 	q->numOrders--;
-	return q;
+	return temp;
 }
 
 /*reads categories.txt and adds a queue for each category to the hashtable*/
@@ -290,7 +290,6 @@ void* producer(void* file)
 				}else{/*if category in the hashtable, add to queue*/
 					if(s->q->numOrders < 10)
 					{
-						s->q->numOrders++;
 						QueuePtr list = s->q;
 						list = enqueue(list, temp);
 						s->q = list;
@@ -324,15 +323,17 @@ void *consumer(void *param)
         {   
                 qNodePtr order = dequeue(queue);
                 int cust = order->customerID;
-                struct myStruct *customer;
-                HASH_FIND_INT(cData, &cust, customer);
+                struct myStruct *s;
+                HASH_FIND_INT(cData, &cust, s);
+                iPtr customer = s->info;
                 double bookprice = order->price;
                 double credit = customer->creditLimit;
                 if (credit >= bookprice)
                 {   
                         customer->creditLimit -= bookprice;
                         revenue += bookprice;
-                        printf("Order Confirmation:\nBook Title: %s\nPrice: %g\n", order->bookTitle, order->price);                        printf("Customer Name: %s\n\tAddress: %s\n", customer->name, customer->address)
+                        printf("Order Confirmation:\nBook Title: %s\nPrice: %g\n", order->bookTitle, order->price);     
+                        printf("Customer Name: %s\n\tAddress: %s\n", customer->name, customer->address);
                         printf("\tState: %s\n\tZip Code: %s\n", customer->state, customer->zip);
                 } else {
                         printf("Order Rejection\n\tCustomer Name: %s\n\tBook Title: %s\n", customer->name, order->bookTitle);
