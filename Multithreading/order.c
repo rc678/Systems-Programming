@@ -7,6 +7,7 @@
 typedef struct qNode{
 	char* bookTitle;
 	int customerID;
+	double price;
 	char* category;
 	struct qNode *next;
 }qNode, *qNodePtr;
@@ -233,14 +234,55 @@ void* producer(void* file)
 
 	char* in; 
 	char line[1000]; 
+	int len = 0;
+	int counter = 0;
+	char* book;
+	char* cat;
+	double* cost;
+	int id;
+	char* token;
+	
 
 	while(in = fgets(line, 1000, f))
 	{
-		printf("line is %s\n", in);
-	}
+		if(in == NULL)
+		{
+			printf("input is null\n");
+			break;
+		}
+
+		len = strlen(line);
+		line[len-1] = '\0';
+		token = strtok(line, "|");
+		
+		while(token != NULL)
+		{
+			if(counter == 0)
+			{
+					
+			}
+			if(counter == 1)
+			{
+
+			}
+			if(counter == 2)
+			{
+
+			}
+			if(counter == 3)
+			{
+				counter = -1;
+			}
+			counter++;
+			token = strtok(NULL, "|");	
+		}/*end of inner while*/
+
+		/*FIGURE OUT WHAT TO DO WITH MUTEX LOCK AND PUT IT HERE*/
+		
+	}/*end of outer while*/
 
 	return NULL;		
-} 
+}/*end of producer function*/ 
 
 int main(int argc, char** argv)
 {
