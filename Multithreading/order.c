@@ -16,6 +16,7 @@ typedef struct Queue{
 	qNodePtr head;
 	qNodePtr tail;
 	int numOrders;
+	pthread_mutex_t lock;
 }Queue, *QueuePtr;
 
 struct my_struct{
@@ -34,6 +35,7 @@ typedef struct custInfo{
 
 void createQueues(char*);
 struct my_struct* cat;
+int numConsumers = 0;
 
 
 QueuePtr enqueue(QueuePtr q, qNodePtr newNode)
@@ -102,7 +104,7 @@ void createQueues(char* categories)
 			s->category = c;
 			QueuePtr temp = (QueuePtr)malloc(sizeof(Queue));
 			s->q = temp;
-			printf("c is %s\n", c);
+			numConsumers++;
 			HASH_ADD_KEYPTR(hh, cat, c, strlen(c), s);
 		}
 	}
@@ -142,8 +144,6 @@ iPtr* createDatabase(char* database){
 		}
 	}while(c != EOF);
 
-	printf("%d\n", lineNum); 	
-
 	iPtr* db = malloc(lineNum * sizeof(custInfo));
 
 	rewind(dbase);
@@ -170,7 +170,6 @@ iPtr* createDatabase(char* database){
 
 		while(token != NULL)
 		{
-			printf("token is %s\n", token);
 			if(counter == 0)
 			{	
 				len = strlen(token);
@@ -298,6 +297,8 @@ void* producer(void* file)
 
 		/*FIGURE OUT WHAT TO DO WITH MUTEX LOCK AND PUT IT HERE*/
 		
+		
+		
 	}/*end of outer while*/
 
 	
@@ -334,6 +335,6 @@ int main(int argc, char** argv)
 	createQueues(categories);	
 	pthread_t producerReturn;
 
-	pthread_create(&producerReturn, NULL, producer, (void *) order);
+	pthread_create(&producerReturn, NULL, producer, order);
 	return 0;
 }
