@@ -110,7 +110,7 @@ void createQueues(char* categories)
 }
 
 /*makes a data structure based on the database.txt*/
-void createDatabase(char* database){
+iPtr* createDatabase(char* database){
 	FILE* dbase;
 
 	dbase = fopen(database, "r");
@@ -212,13 +212,35 @@ void createDatabase(char* database){
 			token = strtok(NULL, "|");		
 		}/*end of inner while*/	
 	}/*end of outer while*/
-	int i;
+	/*int i;
 	for(i = 0; i < lineNum;i++)
 	{
 		printf("in array%s\n", db[i]->name);
-	} 	
-
+	} */	
+	return db;
 }
+
+/*producer thread that will read in data file with book orders and puts them in the queue*/ 
+void* producer(void* file)
+{
+
+	FILE* f = fopen(file, "r");
+	if(f == NULL)
+	{
+		printf("cannot open file\n");
+		exit(EXIT_FAILURE);
+	}
+
+	char* in; 
+	char line[1000]; 
+
+	while(in = fgets(line, 1000, f))
+	{
+		printf("line is %s\n", in);
+	}
+
+	return NULL;		
+} 
 
 int main(int argc, char** argv)
 {
@@ -234,7 +256,8 @@ int main(int argc, char** argv)
 		printf("Too many arguements\n");
 		return 0;
 	}
-
+	
+	iPtr* db = NULL;
 	char* database = argv[1];
 	char* order = argv[2];
 	char* categories = argv[3];
@@ -243,8 +266,11 @@ int main(int argc, char** argv)
 		printf("argument is null\n");
 		return 0;
 	}
-	/*createDatabase(database);*/
-	createQueues(categories);	
 
+	db = createDatabase(database);
+	createQueues(categories);	
+	pthread_t producerReturn;
+
+	pthread_create(&producerReturn, NULL, producer, (void *) order);
 	return 0;
 }
