@@ -316,6 +316,31 @@ void* producer(void* file)
 	return NULL;		
 }/*end of producer function*/ 
 
+void *consumer(void *param)
+{
+        struct Queue *queue = (struct Queue *)param;
+    
+        while (queue->numOrders < 10) 
+        {   
+                qNodePtr order = dequeue(queue);
+                int cust = order->customerID;
+                struct myStruct *customer;
+                HASH_FIND_INT(cData, &cust, customer);
+                double bookprice = order->price;
+                double credit = customer->creditLimit;
+                if (credit >= bookprice)
+                {   
+                        customer->creditLimit -= bookprice;
+                        revenue += bookprice;
+                        printf("Order Confirmation:\nBook Title: %s\nPrice: %g\n", order->bookTitle, order->price);                        printf("Customer Name: %s\n\tAddress: %s\n", customer->name, customer->address)
+                        printf("\tState: %s\n\tZip Code: %s\n", customer->state, customer->zip);
+                } else {
+                        printf("Order Rejection\n\tCustomer Name: %s\n\tBook Title: %s\n", customer->name, order->bookTitle);
+                        printf("\tBook Price: %g\n\tCustomer's Remaining Credit Limit: %g\n", order->price, customer->creditLimit);
+                }   
+        }           
+}/*end of consumer function*/
+
 int main(int argc, char** argv)
 {
 
@@ -340,10 +365,20 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
+	struct my_struct *s, *tmp;
 	createDatabase(database);
 	createQueues(categories);	
 	pthread_t producerReturn;
+	pthread_t consumerReturn[numConsumers];
+        int i = 0;
 
 	pthread_create(&producerReturn, NULL, producer, order);
+	
+	HASH_ITER(hh, cat, s, tmp)
+        {
+                pthread_create(&consumerReturn[i], NULL, consumer, s->q);
+                i++;
+        }
+        
 	return 0;
 }
