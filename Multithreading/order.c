@@ -36,30 +36,30 @@ void createQueues(char*);
 struct my_struct* cat;
 
 
-qNodePtr enqueue(QueuePtr q, qNodePtr newNode)
+QueuePtr enqueue(QueuePtr q, qNodePtr newNode)
 {
 	if (q->head == NULL){
 		q->head = newNode;
 		q->tail = newNode;
 		q->numOrders++;
-		return q->head;
+		return q;
 	}
 
 	q->tail->next = newNode;
 	q->tail = newNode;
 	q->numOrders++;
-	return q->head;
+	return q;
 }
 
-qNodePtr dequeue(QueuePtr q)
+QueuePtr dequeue(QueuePtr q)
 {
 	if (q->head == NULL){
-		return q->head;
+		return q;
 	}
 	qNodePtr temp = q->head;
 	q->head = q->head->next;
 	q->numOrders--;
-	return temp;
+	return q;
 }
 
 /*reads categories.txt and adds a queue for each category to the hashtable*/
@@ -178,7 +178,6 @@ iPtr* createDatabase(char* database){
 				char* name = malloc(len *sizeof(char));
 				strcpy(name, token);
 				temp->name = name;
-
 			}
 			if(counter == 2)
 			{
@@ -226,6 +225,7 @@ void* producer(void* file)
 {
 
 	FILE* f = fopen(file, "r");
+	struct my_struct* s;
 	if(f == NULL)
 	{
 		printf("cannot open file\n");
@@ -237,11 +237,11 @@ void* producer(void* file)
 	int len = 0;
 	int counter = 0;
 	char* book;
-	char* cat;
-	double* cost;
+	char* cate;
+	double cost;
 	int id;
 	char* token;
-	
+	qNodePtr temp;
 
 	while(in = fgets(line, 1000, f))
 	{
@@ -259,19 +259,38 @@ void* producer(void* file)
 		{
 			if(counter == 0)
 			{
-					
+				len = strlen(token);
+				temp = (qNodePtr) malloc(sizeof(qNode));
+				char* book = malloc(len * sizeof(char));
+				strcpy(book, token);
+				temp->bookTitle = book;
 			}
 			if(counter == 1)
 			{
-
+				cost = atof(token);
+				temp->price = cost;
 			}
 			if(counter == 2)
 			{
-
+				id = atoi(token);
+				temp->customerID = id;	
 			}
 			if(counter == 3)
 			{
+				len = strlen(token);
+				cate = malloc(len * sizeof(char));
+				strcpy(cate, token);
+				temp->category = cate;
 				counter = -1;
+				HASH_FIND(hh, cat, cate, strlen(cate), s);
+				if(!s)
+				{
+					break;
+				}else{/*if category in the hashtable, add to queue*/
+					QueuePtr list = s->q;
+					list = enqueue(list, temp);
+					s->q = list;
+				}
 			}
 			counter++;
 			token = strtok(NULL, "|");	
@@ -281,6 +300,8 @@ void* producer(void* file)
 		
 	}/*end of outer while*/
 
+	
+	fclose(f);
 	return NULL;		
 }/*end of producer function*/ 
 
