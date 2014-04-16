@@ -64,7 +64,7 @@ QueuePtr enqueue(QueuePtr q, qNodePtr newNode)
 qNodePtr dequeue(QueuePtr q)
 {
 	if (q->head == NULL){
-		return temp;
+		return NULL;
 	}
 	qNodePtr temp = q->head;
 	q->head = q->head->next;
