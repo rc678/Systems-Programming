@@ -17,6 +17,7 @@ typedef struct Queue{
 	qNodePtr tail;
 	int numOrders;
 	pthread_mutex_t lock;
+	pthread_cond_t nonEmpty;
 }Queue, *QueuePtr;
 
 struct my_struct{
@@ -33,10 +34,17 @@ typedef struct custInfo{
 	char* zip; 
 }custInfo, *iPtr; 
 
-void createQueues(char*);
-struct my_struct* cat;
-int numConsumers = 0;
+struct myStruct{
+	int id;
+	iPtr info;
+	UT_hash_handle hh;
+};
 
+void createQueues(char*);
+struct my_struct* cat = NULL;
+struct myStruct* cData = NULL; 
+int numConsumers = 0;
+int revenue = 0;
 
 QueuePtr enqueue(QueuePtr q, qNodePtr newNode)
 {
@@ -113,7 +121,7 @@ void createQueues(char* categories)
 }
 
 /*makes a data structure based on the database.txt*/
-iPtr* createDatabase(char* database){
+void createDatabase(char* database){
 	FILE* dbase;
 
 	dbase = fopen(database, "r");
@@ -135,26 +143,15 @@ iPtr* createDatabase(char* database){
 	}
 	rewind(dbase);
 
-	/*counts the number of lines in the database.txt*/
-	do{
-		c = fgetc(dbase);
-		if(c == '\n')
-		{
-			lineNum++;
-		}
-	}while(c != EOF);
-
-	iPtr* db = malloc(lineNum * sizeof(custInfo));
-
-	rewind(dbase);
 	char* in;
 	char line[1000];	
 	char* token;
 	int counter = 0;
 	int len;
-	int index = 0;
+	int id = 0;
 	iPtr temp = NULL;
 	double credit = 0.0;
+	struct myStruct* s = NULL;
 
 	while(in = fgets(line, 1000, dbase))
 	{
@@ -178,9 +175,13 @@ iPtr* createDatabase(char* database){
 				strcpy(name, token);
 				temp->name = name;
 			}
+			if(counter == 1)
+			{
+				id = atoi(token);
+			}
 			if(counter == 2)
 			{
-				credit = atoi(token);
+				credit = atof(token);
 				temp->creditLimit = credit;
 			}
 			if(counter == 3)
@@ -203,20 +204,21 @@ iPtr* createDatabase(char* database){
 				char* zip = malloc(len * sizeof(char));
 				strcpy(zip, token);
 				temp->zip = zip;
-				db[index] = temp;
-				index++; 
 				counter = -1;
+				HASH_FIND_INT(cData, &id, s);
+				if(s)
+				{
+					break;
+				}else{
+					s = (struct myStruct*) malloc(sizeof(struct myStruct));
+					s->info = temp;
+					HASH_ADD_INT(cData, id, s);
+				}
 			}
 			counter++;
 			token = strtok(NULL, "|");		
 		}/*end of inner while*/	
 	}/*end of outer while*/
-	/*int i;
-	for(i = 0; i < lineNum;i++)
-	{
-		printf("in array%s\n", db[i]->name);
-	} */	
-	return db;
 }
 
 /*producer thread that will read in data file with book orders and puts them in the queue*/ 
@@ -253,7 +255,7 @@ void* producer(void* file)
 		len = strlen(line);
 		line[len-1] = '\0';
 		token = strtok(line, "|");
-		
+
 		while(token != NULL)
 		{
 			if(counter == 0)
@@ -286,22 +288,30 @@ void* producer(void* file)
 				{
 					break;
 				}else{/*if category in the hashtable, add to queue*/
-					QueuePtr list = s->q;
-					list = enqueue(list, temp);
-					s->q = list;
+					if(s->q->numOrders < 10)
+					{
+						s->q->numOrders++;
+						QueuePtr list = s->q;
+						list = enqueue(list, temp);
+						s->q = list;
+						pthread_mutex_unlock(&s->q->lock);
+						pthread_cond_signal(&s->q->nonEmpty);
+					}else{/*wait for the consumer*/
+						printf("waiting for consumer\n");
+						pthread_mutex_lock(&s->q->lock);	
+					}
 				}
 			}
 			counter++;
 			token = strtok(NULL, "|");	
 		}/*end of inner while*/
 
-		/*FIGURE OUT WHAT TO DO WITH MUTEX LOCK AND PUT IT HERE*/
-		
-		
-		
+		pthread_cond_broadcast(&s->q->nonEmpty);/*double check this later*/
+		/*REMEMBER TO FREE MEMORY*/
+
 	}/*end of outer while*/
 
-	
+
 	fclose(f);
 	return NULL;		
 }/*end of producer function*/ 
@@ -320,8 +330,7 @@ int main(int argc, char** argv)
 		printf("Too many arguements\n");
 		return 0;
 	}
-	
-	iPtr* db = NULL;
+
 	char* database = argv[1];
 	char* order = argv[2];
 	char* categories = argv[3];
@@ -331,7 +340,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	db = createDatabase(database);
+	createDatabase(database);
 	createQueues(categories);	
 	pthread_t producerReturn;
 
