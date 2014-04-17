@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <string.h>
+#include <errno.h>
 
 typedef struct qNode{
 	char* bookTitle;
@@ -16,7 +17,7 @@ typedef struct Queue{
 	qNodePtr head;
 	qNodePtr tail;
 	int numOrders;
-	pthread_mutex_t lock;
+	pthread_mutex_t mut;
 	pthread_cond_t nonEmpty;
 }Queue, *QueuePtr;
 
@@ -61,15 +62,15 @@ QueuePtr enqueue(QueuePtr q, qNodePtr newNode)
 	return q;
 }
 
-qNodePtr dequeue(QueuePtr q)
+QueuePtr dequeue(QueuePtr q)
 {
 	if (q->head == NULL){
-		return NULL;
+		return q;
 	}
 	qNodePtr temp = q->head;
 	q->head = q->head->next;
 	q->numOrders--;
-	return temp;
+	return q;
 }
 
 /*reads categories.txt and adds a queue for each category to the hashtable*/
@@ -290,14 +291,15 @@ void* producer(void* file)
 				}else{/*if category in the hashtable, add to queue*/
 					if(s->q->numOrders < 10)
 					{
+						s->q->numOrders++;
 						QueuePtr list = s->q;
 						list = enqueue(list, temp);
 						s->q = list;
-						pthread_mutex_unlock(&s->q->lock);
+						pthread_mutex_lock(&s->q->mut);
 						pthread_cond_signal(&s->q->nonEmpty);
 					}else{/*wait for the consumer*/
-						printf("waiting for consumer\n");
-						pthread_mutex_lock(&s->q->lock);	
+						pthread_mutex_unlock(&s->q->mut);
+						pthread_cond_wait(&s->q->nonEmpty, &s->q->mut);
 					}
 				}
 			}
@@ -314,33 +316,6 @@ void* producer(void* file)
 	fclose(f);
 	return NULL;		
 }/*end of producer function*/ 
-
-void *consumer(void *param)
-{
-        struct Queue *queue = (struct Queue *)param;
-    
-        while (queue->numOrders < 10) 
-        {   
-                qNodePtr order = dequeue(queue);
-                int cust = order->customerID;
-                struct myStruct *s;
-                HASH_FIND_INT(cData, &cust, s);
-                iPtr customer = s->info;
-                double bookprice = order->price;
-                double credit = customer->creditLimit;
-                if (credit >= bookprice)
-                {   
-                        customer->creditLimit -= bookprice;
-                        revenue += bookprice;
-                        printf("Order Confirmation:\nBook Title: %s\nPrice: %g\n", order->bookTitle, order->price);     
-                        printf("Customer Name: %s\n\tAddress: %s\n", customer->name, customer->address);
-                        printf("\tState: %s\n\tZip Code: %s\n", customer->state, customer->zip);
-                } else {
-                        printf("Order Rejection\n\tCustomer Name: %s\n\tBook Title: %s\n", customer->name, order->bookTitle);
-                        printf("\tBook Price: %g\n\tCustomer's Remaining Credit Limit: %g\n", order->price, customer->creditLimit);
-                }   
-        }           
-}/*end of consumer function*/
 
 int main(int argc, char** argv)
 {
@@ -366,20 +341,10 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	struct my_struct *s, *tmp;
 	createDatabase(database);
 	createQueues(categories);	
-	pthread_t producerReturn;
-	pthread_t consumerReturn[numConsumers];
-        int i = 0;
+	pthread_t producerReturn = NULL;
 
 	pthread_create(&producerReturn, NULL, producer, order);
-	
-	HASH_ITER(hh, cat, s, tmp)
-        {
-                pthread_create(&consumerReturn[i], NULL, consumer, s->q);
-                i++;
-        }
-        
 	return 0;
 }
