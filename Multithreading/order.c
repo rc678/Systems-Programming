@@ -55,13 +55,11 @@ QueuePtr enqueue(QueuePtr q, qNodePtr newNode)
 	if (q->head == NULL){
 		q->head = newNode;
 		q->tail = newNode;
-		q->numOrders++;
 		return q;
 	}
 
 	q->tail->next = newNode;
 	q->tail = newNode;
-	q->numOrders++;
 	return q;
 }
 
@@ -72,7 +70,6 @@ qNodePtr dequeue(QueuePtr q)
 	}
 	qNodePtr temp = q->head;
 	q->head = q->head->next;
-	q->numOrders--;
 	return temp;
 }
 
@@ -210,7 +207,6 @@ void createDatabase(char* database){
 				temp->zip = zip;
 				int i = idIns;
 				counter = -1;
-				printf("id is %d\n", i);
 				HASH_FIND_INT(cData, &i, s);
 				if(s)
 				{
@@ -226,12 +222,6 @@ void createDatabase(char* database){
 			token = strtok(NULL, "|");		
 		}/*end of inner while*/	
 	}/*end of outer while*/
-	struct myStruct *t;
-
-    for(t=cData; t != NULL; t=(struct myStruct*)(t->hh.next)) {
-        printf("user id %d: name %s\n", t->id, t->info->name);
-    }
-	
 }
 
 /*producer thread that will read in data file with book orders and puts them in the queue*/ 
@@ -257,11 +247,6 @@ void* producer(void* file)
 	int id;
 	char* token;
 	qNodePtr temp;
-
-	HASH_ITER(hh, cat, s, tmp)
-	{
-		pthread_mutex_lock(&s->q->mut);
-	} 
 
 	while(in = fgets(line, 1000, f))
 	{
@@ -301,33 +286,39 @@ void* producer(void* file)
 				cate = malloc(len * sizeof(char));
 				strcpy(cate, token);
 				temp->category = cate;
-				counter = -1;
+				counter = 0;
 				HASH_FIND(hh, cat, cate, strlen(cate), s);
+				pthread_mutex_lock(&s->q->mut);
 				if(!s)
 				{
+					free(book);
+					free(cate);
+					pthread_mutex_unlock(&s->q->mut);
 					break;
 				}else{/*if category in the hashtable, add to queue*/
-
 					if(s->q->numOrders == 10){
+						printf("***Producer waits because queue is full***\n");
 						pthread_cond_wait(&s->q->nonFull,&s->q->mut);
+						printf("***Producer resumes because queue has space available***\n");
 					}
 					
 					QueuePtr list = s->q;
 					list = enqueue(list, temp);
 					s->q = list;
+					s->q->numOrders++;
 					pthread_mutex_unlock(&s->q->mut);
 					pthread_cond_signal(&s->q->nonEmpty);
+					break;
 				}
 			}
 			counter++;
 			token = strtok(NULL, "|");	
 		}/*end of inner while*/
 
-		pthread_cond_broadcast(&s->q->nonEmpty);/*double check this later*/
 		/*REMEMBER TO FREE MEMORY*/
 
 	}/*end of outer while*/
-	
+
 
 	fclose(f);
 	return NULL;		
@@ -335,48 +326,52 @@ void* producer(void* file)
 
 void *consumer(void *param)
 {
-        struct Queue *queue = (struct Queue *)param;
-    
-	pthread_mutex_lock(&queue->mut);
-        while (1) 
-        {   
+	struct Queue *queue = (struct Queue *)param;
+	int ordersProcessed = 0;
+
+	while (1) 
+	{  
+		pthread_mutex_lock(&queue->mut); 
 		if(queue->numOrders == 0)
 		{
-			pthread_mutex_unlock(&queue->mut);
 			printf("***Consumer waits if the queue is empty***\n");
 			pthread_cond_wait(&queue->nonEmpty, &queue->mut);
+			printf("***Consumer resumes because queue has orders ready for processing***\n");
 		}
-
-                qNodePtr order = dequeue(queue);
-                int cust = order->customerID;
-                struct myStruct *s;
-                HASH_FIND_INT(cData, &cust, s);
-                iPtr customer = s->info;
-                double bookprice = order->price;
-                double credit = customer->creditLimit;
-                if (credit >= bookprice)
-                {   
-                        customer->creditLimit -= bookprice;
-                        revenue += bookprice;
-                        printf("Order Confirmation:\nBook Title: %s\nPrice: %g\n", order->bookTitle, order->price);     
-                        printf("Customer Name: %s\n\tAddress: %s\n", customer->name, customer->address);
-                        printf("\tState: %s\n\tZip Code: %s\n", customer->state, customer->zip);
+		
+		qNodePtr order = dequeue(queue);
+		queue->numOrders--;
+		int cust = order->customerID;
+		struct myStruct *s;
+		HASH_FIND_INT(cData, &cust, s);
+		iPtr customer = s->info;
+		double bookprice = order->price;
+		double credit = customer->creditLimit;
+		if (credit >= bookprice)
+		{   
+			customer->creditLimit -= bookprice;
+			revenue += bookprice;
+			printf("Order Confirmation:\nBook Title: %s\nPrice: %g\n", order->bookTitle, order->price);    
+			printf("Customer Name: %s\n\tAddress: %s\n", customer->name, customer->address);
+			printf("\tState: %s\n\tZip Code: %s\n", customer->state, customer->zip);
 			qNodePtr succ = (qNodePtr)malloc(sizeof(qNode));
 			succ->price = order->price;
 			succ->bookTitle = order->bookTitle;
 			succ->credRemain = customer->creditLimit;
 			customer->successes = enqueue(customer->successes, succ); 
-                } else {
-                        printf("Order Rejection\n\tCustomer Name: %s\n\tBook Title: %s\n", customer->name, order->bookTitle);
-                        printf("\tBook Price: %g\n\tCustomer's Remaining Credit Limit: %g\n", order->price, customer->creditLimit);
+			ordersProcessed++;
+		} else {
+			printf("Order Rejection\n\tCustomer Name: %s\n\tBook Title: %s\n", customer->name, order->bookTitle);
+			printf("\tBook Price: %g\n\tCustomer's Remaining Credit Limit: %g\n", order->price, customer->creditLimit);
 			qNodePtr fail = (qNodePtr)malloc(sizeof(qNode));
-                        fail->price = order->price;
-                        fail->bookTitle = order->bookTitle;
-                        customer->failures = enqueue(customer->failures, fail);	
-                }   
-
+			fail->price = order->price;
+			fail->bookTitle = order->bookTitle;
+			customer->failures = enqueue(customer->failures, fail);	
+			ordersProcessed++;
+		}   
+		pthread_mutex_unlock(&queue->mut);
 		pthread_cond_signal(&queue->nonFull);
-        }
+	}
 }/*end of consumer function*/
 
 int main(int argc, char** argv)
@@ -384,13 +379,13 @@ int main(int argc, char** argv)
 
 	if(argc < 4)
 	{
-		printf("Too few arguements\n");
+		printf("Too few arguments\n");
 		return 0;
 	}
 
 	if(argc > 4)
 	{
-		printf("Too many arguements\n");
+		printf("Too many arguments\n");
 		return 0;
 	}
 
@@ -408,16 +403,16 @@ int main(int argc, char** argv)
 	createQueues(categories);	
 	pthread_t producerReturn;
 	pthread_t consumerReturn[numConsumers];
-        int i = 0;
+	int i = 0;
 
 	pthread_create(&producerReturn, NULL, producer, order);
-	
+
 	HASH_ITER(hh, cat, s, tmp)
-        {
-                pthread_create(&consumerReturn[i], NULL, consumer, s->q);
-                i++;
-        }
-        
+	{
+		pthread_create(&consumerReturn[i], NULL, consumer, s->q);
+		i++;
+	}
+
 	pthread_join(producerReturn, NULL);
 	for(i = 0; i < numConsumers; i++)
 	{
