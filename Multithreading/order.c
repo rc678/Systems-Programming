@@ -152,11 +152,11 @@ void createDatabase(char* database){
 	char* token;
 	int counter = 0;
 	int len;
-	int id = 0;
+	int idIns = 0;
 	iPtr temp = NULL;
 	double credit = 0.0;
 	struct myStruct* s = NULL;
-
+	struct myStruct* tmp = NULL;
 	while(in = fgets(line, 1000, dbase))
 	{
 
@@ -181,7 +181,7 @@ void createDatabase(char* database){
 			}
 			if(counter == 1)
 			{
-				id = atoi(token);
+				idIns = atoi(token);
 			}
 			if(counter == 2)
 			{
@@ -208,21 +208,30 @@ void createDatabase(char* database){
 				char* zip = malloc(len * sizeof(char));
 				strcpy(zip, token);
 				temp->zip = zip;
+				int i = idIns;
 				counter = -1;
-				HASH_FIND_INT(cData, &id, s);
+				printf("id is %d\n", i);
+				HASH_FIND_INT(cData, &i, s);
 				if(s)
 				{
 					break;
 				}else{
 					s = (struct myStruct*) malloc(sizeof(struct myStruct));
+					s->id = i;
 					s->info = temp;
-					HASH_ADD_INT(cData, id, s);
+					HASH_ADD_INT(cData, id , s);
 				}
 			}
 			counter++;
 			token = strtok(NULL, "|");		
 		}/*end of inner while*/	
 	}/*end of outer while*/
+	struct myStruct *t;
+
+    for(t=cData; t != NULL; t=(struct myStruct*)(t->hh.next)) {
+        printf("user id %d: name %s\n", t->id, t->info->name);
+    }
+	
 }
 
 /*producer thread that will read in data file with book orders and puts them in the queue*/ 
@@ -318,7 +327,7 @@ void* producer(void* file)
 		/*REMEMBER TO FREE MEMORY*/
 
 	}/*end of outer while*/
-
+	
 
 	fclose(f);
 	return NULL;		
@@ -416,3 +425,4 @@ int main(int argc, char** argv)
 	}
 	return 0;
 }
+
