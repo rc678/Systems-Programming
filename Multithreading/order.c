@@ -5,11 +5,12 @@
 #include <string.h>
 
 typedef struct qNode{
-	char* bookTitle;
-	int customerID;
 	double price;
-	char* category;
 	double credRemain;
+	int customerID;
+	int noMoreOrders;
+	char* bookTitle;
+	const char* category;
 	struct qNode *next;
 }qNode, *qNodePtr;
 
@@ -59,7 +60,7 @@ QueuePtr enqueue(QueuePtr q, qNodePtr newNode)
 	}
 
 	q->tail->next = newNode;
-	q->tail = newNode;
+	q->tail = q->tail->next;
 	return q;
 }
 
@@ -68,6 +69,14 @@ qNodePtr dequeue(QueuePtr q)
 	if (q->head == NULL){
 		return NULL;
 	}
+
+	if (q->head->next == NULL){
+		qNodePtr temp = q->head;
+		q->head = NULL;
+		q->tail = NULL;
+		return temp;
+	}
+
 	qNodePtr temp = q->head;
 	q->head = q->head->next;
 	return temp;
@@ -170,7 +179,7 @@ void createDatabase(char* database){
 		{
 			if(counter == 0)
 			{	
-				len = strlen(token);
+				len = strlen(token)+1;
 				temp = (iPtr) malloc(sizeof(custInfo));
 				char* name = malloc(len *sizeof(char));
 				strcpy(name, token);
@@ -187,24 +196,26 @@ void createDatabase(char* database){
 			}
 			if(counter == 3)
 			{
-				len = strlen(token);
+				len = strlen(token) + 1;
 				char* street = malloc(len * sizeof(char));
 				strcpy(street, token);
 				temp->address = street;
 			}
 			if(counter == 4)
 			{
-				len = strlen(token);
+				len = strlen(token) + 1;
 				char* state = malloc(len * sizeof(char));
 				strcpy(state, token);
 				temp->state = state;
 			}
 			if(counter == 5)
 			{
-				len = strlen(token);
+				len = strlen(token) + 1;
 				char* zip = malloc(len * sizeof(char));
 				strcpy(zip, token);
 				temp->zip = zip;
+				temp->successes = (QueuePtr)malloc(sizeof(Queue));
+				temp->failures = (QueuePtr)malloc(sizeof(Queue));
 				int i = idIns;
 				counter = -1;
 				HASH_FIND_INT(cData, &i, s);
@@ -264,7 +275,7 @@ void* producer(void* file)
 		{
 			if(counter == 0)
 			{
-				len = strlen(token);
+				len = strlen(token) + 1;
 				temp = (qNodePtr) malloc(sizeof(qNode));
 				char* book = malloc(len * sizeof(char));
 				strcpy(book, token);
@@ -282,11 +293,26 @@ void* producer(void* file)
 			}
 			if(counter == 3)
 			{
-				len = strlen(token);
+				len = strlen(token) + 1;
 				cate = malloc(len * sizeof(char));
 				strcpy(cate, token);
 				temp->category = cate;
 				counter = 0;
+
+				struct my_struct *p;
+				qNodePtr curr;
+				/*for(p = cat; p != NULL; p = p->hh.next){
+					if(p->q->head == NULL){
+						printf("queue is empty\n");
+						break;
+					}
+					printf("category: %s\n", p->category);
+					for(curr = p->q->head; curr != NULL; curr = curr->next){
+						printf("Node is %s\n",curr->bookTitle);
+					}
+				}*/
+
+
 				HASH_FIND(hh, cat, cate, strlen(cate), s);
 				pthread_mutex_lock(&s->q->mut);
 				if(!s)
@@ -296,12 +322,14 @@ void* producer(void* file)
 					pthread_mutex_unlock(&s->q->mut);
 					break;
 				}else{/*if category in the hashtable, add to queue*/
-					if(s->q->numOrders == 10){
+					if(s->q->numOrders == 10)
+					{
+						pthread_cond_signal(&s->q->nonEmpty);
 						printf("***Producer waits because queue is full***\n");
 						pthread_cond_wait(&s->q->nonFull,&s->q->mut);
 						printf("***Producer resumes because queue has space available***\n");
 					}
-					
+			
 					QueuePtr list = s->q;
 					list = enqueue(list, temp);
 					s->q = list;
@@ -314,32 +342,49 @@ void* producer(void* file)
 			counter++;
 			token = strtok(NULL, "|");	
 		}/*end of inner while*/
+		
 
 		/*REMEMBER TO FREE MEMORY*/
 
 	}/*end of outer while*/
 
 
+	HASH_ITER(hh, cat, s, tmp){
+		pthread_mutex_lock(&s->q->mut);
+		temp = (qNodePtr)malloc(sizeof(qNode));
+		temp->noMoreOrders = 1;
+		temp->category = s->category;
+		s->q = enqueue(s->q, temp);
+		pthread_mutex_unlock(&s->q->mut);
+                pthread_cond_signal(&s->q->nonEmpty);
+	}
+
 	fclose(f);
-	return NULL;		
+	return 0;		
 }/*end of producer function*/ 
 
 void *consumer(void *param)
 {
 	struct Queue *queue = (struct Queue *)param;
 	int ordersProcessed = 0;
+	const char* cgry;
 
 	while (1) 
 	{  
 		pthread_mutex_lock(&queue->mut); 
 		if(queue->numOrders == 0)
 		{
+			pthread_cond_signal(&queue->nonFull);
 			printf("***Consumer waits if the queue is empty***\n");
 			pthread_cond_wait(&queue->nonEmpty, &queue->mut);
 			printf("***Consumer resumes because queue has orders ready for processing***\n");
 		}
 		
 		qNodePtr order = dequeue(queue);
+		if(order->noMoreOrders == 1){
+			cgry = order->category;
+			break;
+		}
 		queue->numOrders--;
 		int cust = order->customerID;
 		struct myStruct *s;
@@ -351,9 +396,7 @@ void *consumer(void *param)
 		{   
 			customer->creditLimit -= bookprice;
 			revenue += bookprice;
-			printf("Order Confirmation:\nBook Title: %s\nPrice: %g\n", order->bookTitle, order->price);    
-			printf("Customer Name: %s\n\tAddress: %s\n", customer->name, customer->address);
-			printf("\tState: %s\n\tZip Code: %s\n", customer->state, customer->zip);
+			printf("Order Confirmation:\nBook Title: %s\nPrice: %g\nCustomer Name: %s\n\tAddress: %s\n\tState: %s\n\tZip Code: %s\n", order->bookTitle, order->price, customer->name, customer->address, customer->state, customer->zip);    
 			qNodePtr succ = (qNodePtr)malloc(sizeof(qNode));
 			succ->price = order->price;
 			succ->bookTitle = order->bookTitle;
@@ -361,17 +404,20 @@ void *consumer(void *param)
 			customer->successes = enqueue(customer->successes, succ); 
 			ordersProcessed++;
 		} else {
-			printf("Order Rejection\n\tCustomer Name: %s\n\tBook Title: %s\n", customer->name, order->bookTitle);
-			printf("\tBook Price: %g\n\tCustomer's Remaining Credit Limit: %g\n", order->price, customer->creditLimit);
+			printf("Order Rejection\n\tCustomer Name: %s\n\tBook Title: %s\n\tBook Price: %g\n\tCustomer's Remaining Credit Limit: %g\n", customer->name, order->bookTitle, order->price, customer->creditLimit);
 			qNodePtr fail = (qNodePtr)malloc(sizeof(qNode));
 			fail->price = order->price;
 			fail->bookTitle = order->bookTitle;
 			customer->failures = enqueue(customer->failures, fail);	
 			ordersProcessed++;
-		}   
+		} 
 		pthread_mutex_unlock(&queue->mut);
 		pthread_cond_signal(&queue->nonFull);
 	}
+
+	printf("%d orders processed for consumer thread %s\n", ordersProcessed, cgry);
+	pthread_mutex_unlock(&queue->mut);
+	return 0;
 }/*end of consumer function*/
 
 int main(int argc, char** argv)
@@ -405,6 +451,14 @@ int main(int argc, char** argv)
 	pthread_t consumerReturn[numConsumers];
 	int i = 0;
 
+	HASH_ITER(hh, cat, s, tmp)
+        {   
+                pthread_mutex_init(&s->q->mut, NULL);
+                pthread_cond_init(&s->q->nonEmpty, NULL);
+                pthread_cond_init(&s->q->nonFull, NULL);
+                s->q->numOrders = 0;
+        }   
+
 	pthread_create(&producerReturn, NULL, producer, order);
 
 	HASH_ITER(hh, cat, s, tmp)
@@ -412,11 +466,34 @@ int main(int argc, char** argv)
 		pthread_create(&consumerReturn[i], NULL, consumer, s->q);
 		i++;
 	}
-
+	
 	pthread_join(producerReturn, NULL);
 	for(i = 0; i < numConsumers; i++)
 	{
 		pthread_join(consumerReturn[i], NULL);
+	}
+
+	printf("\nAll orders have been processed. The following is the final report:\n");
+	
+	struct myStruct *y;
+	struct myStruct *m;
+	qNodePtr curr;
+	HASH_ITER(hh, cData, y, m)
+	{
+		printf("\n=== BEGIN CUSTOMER INFO ===\n### BALANCE ###\n");
+		printf("Customer name: %s\nCustomer ID number: %d\n", y->info->name, y->id);
+		printf("Remaining credit balance after all purchases: $%g\n", y->info->creditLimit);	
+		printf("### SUCCESSFUL ORDERS ###\n");
+		for(curr = y->info->successes->head; curr != NULL; curr = curr->next)
+		{
+			printf("%s|$%g|$%g\n", curr->bookTitle, curr->price, curr->credRemain);
+		}
+		printf("### REJECTED ORDERS ###\n");
+		for(curr = y->info->failures->head; curr != NULL; curr = curr->next)
+                {
+                        printf("%s|$%g\n", curr->bookTitle, curr->price);
+                }
+		printf("=== END OF CUSTOMER INFO ===\n");
 	}
 	return 0;
 }
