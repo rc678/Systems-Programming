@@ -1,9 +1,8 @@
 all: order
 
-order.o: order.c uthash.h
-	gcc -c -lpthread order.c
-order: order.o
-	gcc -o order order.o
-clean:
+order: uthash.h queue.h order.c
+	gcc -pthread -o order order.c
+	
+clean: 
 	rm -f order
 	rm -f *.o
