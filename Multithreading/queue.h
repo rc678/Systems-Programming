@@ -3,7 +3,7 @@ typedef struct qNode{
 	double price;
 	double credRemain; /*customers remaining credit after processed order*/
 	int customerID;
-	int noMoreOrders /*boolean to signify that all orders have been acounted for by producer*/
+	int noMoreOrders; /*boolean to signify that all orders have been acounted for by producer*/
 	char* bookTitle;
 	const char* category;
 	struct qNode *next;
@@ -16,7 +16,7 @@ typedef struct Queue{
 	int numOrders; /*current number of orders in queue*/
 	pthread_mutex_t mut;
 	pthread_cond_t nonEmpty; /*condition variable signifying there is data available to be processed in the queue*/
-	pthread_cond_t nonFull /*condition variable signifying there is space available to add data to the queue*/
+	pthread_cond_t nonFull; /*condition variable signifying there is space available to add data to the queue*/
 }Queue, *QueuePtr;
 
 /*adds item to the front of the queue and returns the queue*/
