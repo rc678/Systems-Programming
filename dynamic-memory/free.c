@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void* malloc(size_t size)
+void* my_malloc(unsigned int size, char* file, int line)
 {
-
+	
 }
 
-void free(void*)
+void my_free(void* ptr, char* file, int line)
 {
 
 }
@@ -15,3 +15,4 @@ int main(int argc, char** argv)
 {
 
 }
+
