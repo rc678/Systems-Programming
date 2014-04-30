@@ -5,7 +5,7 @@
 #define malloc(x) my_malloc(x, __FILE__, __LINE__)
 #define free(x) my_free(x, __FILE__, __LINE__)
 
-#define block 5000
+#define blockSize 5000
 #define TA_TEST_BLOCKSIZE 100
 
 static char heap[block];
@@ -31,7 +31,7 @@ void* my_malloc(unsigned int size, char* file, int line)
 		root->prev = 0;
 		root->next = 0;
 		root->prev = root->next;
-		root->size = block - sizeof(struct memEntry);
+		root->size = blockSize - sizeof(struct memEntry);
 		root->free = 1;
 		initialized = 1;	
 	}
@@ -75,8 +75,33 @@ void* my_malloc(unsigned int size, char* file, int line)
 
 void my_free(void* ptr, char* file, int line)
 {
+        struct memEntry *curr, *previous, *nxt;
+        curr = (struct memEntry*)((char*)ptr - sizeof(struct memEntry));
+        previous = curr->prev;
 
+        if(previous == NULL || previous->free == 0)
+        {   
+                curr->free = 1;
+                previous = curr;
+        } else {
+                previous->size += (sizeof(struct memEntry) + curr->size);
+                previous->next = curr->next;
+                if(curr->next != 0)
+                {   
+                        curr->next->prev = previous;
+                }   
+        }   
 
+        nxt = curr->next;
+        if(nxt != 0 && nxt->free == 1)
+        {   
+                previous->size += (sizeof(struct memEntry) + nxt->size);
+                previous->next = nxt->next;
+                if (nxt->next != NULL)
+                {   
+                        nxt->next->prev = previous;
+                }   
+        }   
 }
 
 /*include for testing purposes?*/
