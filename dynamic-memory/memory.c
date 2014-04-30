@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "memory.h"
 
-#define block 1000
+#define block 5000
 static char heap[block];
 
 void* my_malloc(unsigned int size, char* file, int line)
@@ -11,7 +11,13 @@ void* my_malloc(unsigned int size, char* file, int line)
 	static int initialized = 0; 
 	struct memEntry* ptr;
 	struct memEntry* succ;
-	void* result = NULL; 
+	void* result = NULL;
+	
+	if(size == 0)
+	{
+		printf("nothing to allocate\n");
+		break;
+	} 
 
 	if(initialized == 0)/*root is not initialized*/
 	{
@@ -58,13 +64,19 @@ void* my_malloc(unsigned int size, char* file, int line)
 			return result; 
 		}
 	}/*end of while*/ 
+	return 0;
 }/*end of function*/
 
 void my_free(void* ptr, char* file, int line)
 {
+	struct memEntry* ptr;
+	struct memEntry* prev;
+	struct memEntry* succ;
 
+	
 }
 
+/*include for testing purposes?*/
 int main(int argc, char** argv)
 {
 
