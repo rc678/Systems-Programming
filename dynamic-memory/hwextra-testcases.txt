@@ -1,4 +1,33 @@
-1.) freeing pointers that were never allocated
+1.) Freeing pointers that were never allocated
+
 Input: int y;
        free(y);
-Expected output:
+Expected output: "Trying to free a a pointer that was never allocated."
+
+2.) Freeing pointer to dynamic memory that was not returned from malloc.
+
+Input: int *p = (int*)malloc(sizeof(int));
+       free(p + 10);
+Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc"
+
+3.) Freeing the same pointer more than once
+
+Input: int *p = (int*)malloc(sizeof(int));
+       free(p);
+       free(p);
+Expected output: "successfully freed"
+                 "Trying to free a pointer that has been already freed."
+                 
+4.) Mallocing and freeing multiple times
+
+Input: int *p = (int*)malloc(sizeof(int));
+       free(p);
+       p = (int*)malloc(sizeof(int));
+       free(p);
+Expected output: "successfully freed"
+                 "successfully freed"
+
+5.) Saturation
+
+Input: 
+                     
