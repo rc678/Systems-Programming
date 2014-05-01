@@ -67,6 +67,7 @@ void* my_malloc(unsigned int size, char* file, int line)
 			return result;
 		}
 	}/*end of while*/ 
+	printf("cannot allocate because there is no memory left\n");
 	return 0;
 }/*end of function*/
 
