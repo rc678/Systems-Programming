@@ -41,9 +41,13 @@ Input: int *p = (int*)malloc(sizeof(int));
        free(p);
 Expected Output: "successfully freed"
 
-7.) 
+7.) Freeing in the middle of two memory blocks
 
-Input: Freeing in the middle of two memory blocks
-Expected output: 
+Input: char* p = malloc(10*sizeof(char));
+       int* ptr = (int*)malloc(10* sizeof(int));
+       free(p + 12);
+       
+Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc"
+
 
 
