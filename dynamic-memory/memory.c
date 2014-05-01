@@ -2,15 +2,12 @@
 #include <stdlib.h>
 #include "memory.h"
 
-#define malloc(x) my_malloc(x, __FILE__, __LINE__)
-#define free(x) my_free(x, __FILE__, __LINE__)
-
 #define blockSize 5000
-#define TA_TEST_BLOCKSIZE 100
+#define malloc( x ) my_malloc( x, __FILE__, __LINE__ )
+#define free( x ) my_free( x, __FILE__, __LINE__ )
 
-static char heap[block];
+static char heap[blockSize];
 
-/*line is the line number that is calling from the file*/
 void* my_malloc(unsigned int size, char* file, int line)
 {
 	static struct memEntry* root = 0;
@@ -18,7 +15,7 @@ void* my_malloc(unsigned int size, char* file, int line)
 	struct memEntry* ptr;
 	struct memEntry* succ;
 	void* result = NULL;
-
+	
 	if(size == 0)
 	{
 		printf("nothing to allocate\n");
@@ -43,13 +40,13 @@ void* my_malloc(unsigned int size, char* file, int line)
 		{
 			ptr = ptr->next; 
 		}
-		else if(ptr->free == 0)/*block is being used*/
+		else if(ptr->free == -1)/*block is being used*/
 		{
 			ptr = ptr->next;
 		}
 		else if(ptr->size < (size + sizeof(struct memEntry))) 
 		{
-			ptr->free = 0;
+			ptr->free = -1;
 			result = (char*) ptr + sizeof(struct memEntry);
 			return result;
 		}else
@@ -65,9 +62,9 @@ void* my_malloc(unsigned int size, char* file, int line)
 			succ->size = ptr->size + sizeof(struct memEntry)-size;
 			succ->free = 1;
 			ptr->size = size;
-			ptr->free = 0;
+			ptr->free = -1;
 			result = (char*)ptr + sizeof(struct memEntry);
-			return result; 
+			return result;
 		}
 	}/*end of while*/ 
 	return 0;
@@ -75,38 +72,92 @@ void* my_malloc(unsigned int size, char* file, int line)
 
 void my_free(void* ptr, char* file, int line)
 {
-        struct memEntry *curr, *previous, *nxt;
-        curr = (struct memEntry*)((char*)ptr - sizeof(struct memEntry));
-        previous = curr->prev;
+	int loc  = (int)((char*)ptr - (char*)heap);
+	if(loc < 0 || loc > blockSize){
+		printf("Trying to free a pointer that was never allocated\n");
+		return;
+	}
+	
+	struct memEntry *curr, *previous, *nxt;
 
-        if(previous == NULL || previous->free == 0)
-        {   
-                curr->free = 1;
-                previous = curr;
-        } else {
-                previous->size += (sizeof(struct memEntry) + curr->size);
-                previous->next = curr->next;
-                if(curr->next != 0)
-                {   
-                        curr->next->prev = previous;
-                }   
-        }   
+	curr = (struct memEntry*)((char*)ptr - sizeof(struct memEntry));
 
-        nxt = curr->next;
-        if(nxt != 0 && nxt->free == 1)
-        {   
-                previous->size += (sizeof(struct memEntry) + nxt->size);
-                previous->next = nxt->next;
-                if (nxt->next != NULL)
-                {   
-                        nxt->next->prev = previous;
-                }   
-        }   
+	/*printf("curr->free is %d\n", curr->free);*/
+	
+	if(curr->free != -1 && curr->free != 1)
+	{
+		printf("Trying to free a pointer to dynamic memory that was not returned from my_malloc\n");
+		return;
+	}
+
+	if(curr->free == 1){
+		printf("Trying to free a pointer that has already been freed\n");
+		return;
+	}
+
+	previous = curr->prev;
+
+	if(previous == NULL || previous->free == -1)
+	{
+		curr->free = 1;
+		previous = curr;
+	} else {
+		previous->size += (sizeof(struct memEntry) + curr->size);
+		previous->next = curr->next;
+	 	if(curr->next != 0)
+		{
+			curr->next->prev = previous;
+		}
+	}
+
+	nxt = curr->next;
+	if(nxt != 0 && nxt->free == 1)
+	{
+		previous->size += (sizeof(struct memEntry) + nxt->size);
+		previous->next = nxt->next;
+		if (nxt->next != NULL)
+		{
+			nxt->next->prev = previous;
+		}
+	}
+	printf("successfully freed\n");
 }
 
 /*include for testing purposes?*/
 int main(int argc, char** argv)
 {
+	/*
+	int x;
+	free(&x);
+
+	int *y = (int*)malloc(sizeof(int));
+	free(y);
+	free(y + 1);
+	free(y);
+
+	y = (int*)malloc(sizeof(int));
+	free(y);
+
+	int *a = (int*)malloc(sizeof(int));
+	int *b = (int*)malloc(sizeof(int));
+	int *c = (int*)malloc(sizeof(int));
+	int *d = (int*)malloc(sizeof(int));
+	int *e = (int*)malloc(sizeof(int));
+	int *f = (int*)malloc(sizeof(int));
+	int *g = (int*)malloc(sizeof(int));
+	int *h = (int*)malloc(sizeof(int));
+
+	free(h);
+
+	struct memEntry *temp;
+
+	for(temp = (struct memEntry*)heap; temp != NULL; temp = temp->next){
+		if (temp->free == -1){
+			printf("size of dynamically allocated space for this memEntry is %d\n", temp->size);
+		}
+	}
+	*/
+	
 	int casenum;
 
 
