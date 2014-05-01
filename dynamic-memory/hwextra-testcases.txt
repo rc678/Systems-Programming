@@ -29,5 +29,21 @@ Expected output: "successfully freed"
 
 5.) Saturation
 
-Input: 
-                     
+Input: while(malloc(100 * sizeof(int)))
+       {
+              
+       }
+Expected output: "cannot allocate because there is no mmory left"
+
+6.) Freeing memory of allocated data
+
+Input: int *p = (int*)malloc(sizeof(int));
+       free(p);
+Expected Output: "successfully freed"
+
+7.) 
+
+Input: Freeing in the middle of two memory blocks
+Expected output: 
+
+
