@@ -1,0 +1,4 @@
+1.) freeing pointers that were never allocated
+Input: int y;
+       free(y);
+Expected output:
