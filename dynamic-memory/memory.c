@@ -110,7 +110,7 @@ void my_free(void* ptr, char* file, int line)
 	/*If the offset of the current memEntry where free would be located does not hold valid data, then this must be an invalid address to free within the memory block*/
 	if(curr->free != -1 && curr->free != 1)
 	{
-		printf("Error in file %s on line %d: Trying to free a pointer to dynamic memory that was not returned from my_malloc\n", file, line);
+		printf("Error in file %s on line %d: Trying to free a pointer to dynamic memory that was not returned\n", file, line);
 		return;
 	}
 
