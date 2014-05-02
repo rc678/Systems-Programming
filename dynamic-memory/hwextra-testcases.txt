@@ -1,4 +1,4 @@
-1.) Freeing pointers that were never allocated
+1.) Freeing pointers that were never allocated using using malloc or calloc
 
 Input: int y;
        free(&y);
@@ -26,7 +26,7 @@ Input: int *p = (int*)malloc(sizeof(int));
        free(p);
 Expected output: "successfully frees allocated data"
 
-5.) Saturation
+5.) Saturation in malloc
 
 Input: while(malloc(100 * sizeof(int)))
        {
@@ -34,26 +34,26 @@ Input: while(malloc(100 * sizeof(int)))
        }
 Expected output: "cannot allocate because there is no mmory left"
 
-6.) Freeing memory of allocated data
+6.) Freeing memory of malloced data
 
 Input: int *p = (int*)malloc(sizeof(int));
        free(p);
 Expected Output: "successfully frees allocated data"
 
-7.) Freeing in the middle of two memory blocks
+7.) Freeing in the middle of two memory blocks that were malloced
 
 Input: char* p = malloc(10*sizeof(char));
        int* ptr = (int*)malloc(10* sizeof(int));
        free(p + 12);
        
-Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc"
+Expected output: "Trying to free a pointer to dynamic memory that was not returned"
 
-8.) Freeing pointer in the middle of an allocated memory block
+8.) Freeing pointer in the middle of a malloced memory block
 
 Input: int *p = (int*)malloc(10*sizeof(int));
        free(p + 6);
 
-Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc" 
+Expected output: "Trying to free a pointer to dynamic memory that was not returned" 
 
 9.) Mallocing data
 
@@ -65,4 +65,42 @@ Expected Output:
 Input: int *p = (int*)malloc(15*sizeof(int));
        free(p - 1);
        int* ptr =  malloc(17*sizeof(int));
-Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc" 
+Expected output: "Trying to free a pointer to dynamic memory that was not returned" 
+
+11.) Callocing and then freeing one set of data
+Input: int *p = (int*)calloc(2, sizeof(int));
+       free(p);
+Expected output: Successfully callocs and frees the data
+
+12.) Callocing and freeing multiple times
+
+Input: int *p = (int*)calloc(2, sizeof(int));
+       free(p);
+       int *p = (int*)calloc(2, sizeof(int));
+       free(p);
+Expected output: Successfully callocs and frees the data
+
+13.) Callocing a size greater than the heap
+
+Input: calloc(10000,sizeof(int));
+Expected output: Heap is too small to allocate all data
+
+14.) Saturation in calloc
+
+Input: while(calloc(1, 100*sizeof(int)))
+       {
+       
+       }
+Expected output:  Dynamic memory is saturated - there are no available chunks of memory big enough to allocate this data
+
+15.) Freeing pointer in the middle of a calloced memory block
+
+Input: int *p = (int*)calloc(1, 10*sizeof(int));
+       free(p + 6);
+Expected Output: Dynamic memory is saturated - there are no available chunks of memory big enough to allocate this data
+
+16.) Freeing a pointer that is in the memEntry struct and then callocing.
+
+Input:
+Expected output: Trying to free a pointer to dynamic memory that was not returned
+
