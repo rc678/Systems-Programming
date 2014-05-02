@@ -8,7 +8,7 @@ Expected output: "Trying to free a a pointer that was never allocated."
 
 Input: int *p = (int*)malloc(sizeof(int));
        free(p + 10);
-Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc"
+Expected output: "Trying to free a pointer to dynamic memory that was not returned"
 
 3.) Freeing the same pointer more than once
 
@@ -32,7 +32,7 @@ Input: while(malloc(100 * sizeof(int)))
        {
               
        }
-Expected output: "cannot allocate because there is no mmory left"
+Expected output: "cannot allocate because there is no memory left"
 
 6.) Freeing memory of malloced data
 
@@ -101,6 +101,8 @@ Expected Output: Dynamic memory is saturated - there are no available chunks of 
 
 16.) Freeing a pointer that is in the memEntry struct and then callocing.
 
-Input:
+Input: int* p = (int*)calloc(1, 15* sizeof(int));
+       free(p-1);
+       int* ptr = calloc(1, 17*sizeof(int));
 Expected output: Trying to free a pointer to dynamic memory that was not returned
 
