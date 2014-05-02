@@ -229,7 +229,6 @@ void* my_calloc(int numMembers, unsigned int size, char* file, int line)
                                 char *tmp = (char*)ptr + sizeof(struct memEntry) + i;
                                 tmp = 0;
                         }
-			printf("HABASH %d\n", *((char*)ptr + sizeof(struct memEntry)+2));
 			succ = (struct memEntry*) ((char*)ptr + sizeof(struct memEntry) + size);
 			succ->prev = ptr;
 			succ->next = ptr->next;
