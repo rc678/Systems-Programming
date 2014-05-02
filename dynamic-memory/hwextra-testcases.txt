@@ -1,7 +1,7 @@
 1.) Freeing pointers that were never allocated
 
 Input: int y;
-       free(y);
+       free(&y);
 Expected output: "Trying to free a a pointer that was never allocated."
 
 2.) Freeing pointer to dynamic memory that was not returned from malloc.
@@ -15,7 +15,7 @@ Expected output: "Trying to free a pointer to dynamic memory that was not return
 Input: int *p = (int*)malloc(sizeof(int));
        free(p);
        free(p);
-Expected output: "successfully freed"
+Expected output: "successfully frees allocated data"
                  "Trying to free a pointer that has been already freed."
                  
 4.) Mallocing and freeing multiple times
@@ -24,8 +24,7 @@ Input: int *p = (int*)malloc(sizeof(int));
        free(p);
        p = (int*)malloc(sizeof(int));
        free(p);
-Expected output: "successfully freed"
-                 "successfully freed"
+Expected output: "successfully frees allocated data"
 
 5.) Saturation
 
@@ -39,7 +38,7 @@ Expected output: "cannot allocate because there is no mmory left"
 
 Input: int *p = (int*)malloc(sizeof(int));
        free(p);
-Expected Output: "successfully freed"
+Expected Output: "successfully frees allocated data"
 
 7.) Freeing in the middle of two memory blocks
 
@@ -49,5 +48,21 @@ Input: char* p = malloc(10*sizeof(char));
        
 Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc"
 
+8.) Freeing pointer in the middle of an allocated memory block
 
+Input: int *p = (int*)malloc(10*sizeof(int));
+       free(p + 6);
 
+Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc" 
+
+9.) Mallocing data
+
+Input: int *p = (int*)malloc(10*sizeof(int));
+Expected Output:
+
+10.) Freeing a pointer that is in the memEntry struct and then mallocing.
+
+Input: int *p = (int*)malloc(15*sizeof(int));
+       free(p - 1);
+       int* ptr =  malloc(17*sizeof(int));
+Expected output: "Trying to free a pointer to dynamic memory that was not returned from my_malloc" 
