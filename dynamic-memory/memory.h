@@ -6,4 +6,5 @@ struct memEntry{
 };
 
 void* my_malloc(unsigned int size, char* file, int line);
+void* my_calloc(int, unsigned int, char*, int);
 void my_free(void* ptr, char* file, int line);
