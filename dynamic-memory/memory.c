@@ -146,9 +146,3 @@ void my_free(void* ptr, char* file, int line)
 		}
 	}
 }
-
-/*include for testing purposes?*/
-int main(int argc, char** argv)
-{
-
-}
